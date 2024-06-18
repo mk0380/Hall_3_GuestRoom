@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>{{title}}</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        p {
+            color: #555;
+        }
+
+        .important-text {
+            color: #e44d26;
+            font-weight: bold;
+        }
+        .closing {
+            font-style: italic;
+            color: #333;
+            line-height: 0.9;
+        }
+        .last{
+            margin-top: 35px;
+            color: #555;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <p>Dear {{name}},</p>
+
+    <p>We confirm the successful receipt of your payment for the guest room booking at Hall Of Residence 3. We greatly appreciate your promptness in settling the payment.</p>
+
+
+    <p>Booking Details:</p>
+    <p>Booking ID: <span class="important-text">{{id}}</span></p>
+    <p>Check-in Date: <span class="important-text">{{arrivalDate}}</span></p>
+    <p>Check-out Date: <span class="important-text">{{departureDate}}</span></p>
+    <p>Room Details: <span class="important-text">{{roomNo}}({{roomType}})</span></p>
+    <p>Amount Paid: <span class="important-text">Rs.{{amount}}</span></p>
+
+    <p>Thank you for choosing us as your preferred accommodation. It has been a pleasure serving you, and we can't wait to create more wonderful memories together in the future.</p>
+
+    <p>Best regards,</p>
+    <p><span class="closing">{{hec_name}} <br>{{hec_position}}<br>Hall Executive Committee<br>Hall of Residence 3</span></p>
+
+    <p class="last">Please note that this is an automated email, and responses to this email will not be monitored.</p>
+
+
+</body>
+</html>

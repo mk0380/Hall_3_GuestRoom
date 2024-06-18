@@ -1,0 +1,127 @@
+@media only screen and (max-width: 890px){
+    .buttons{
+        height: min-content;
+        gap: 10px;
+        flex-direction: column;
+        margin: 2px auto;
+        padding: 10px;
+        align-items: center;
+    }
+    .result{
+        width: 98% !important;
+        /* padding: 10px; */
+        overflow-x: scroll;
+        overflow-y: hidden;
+        /* border: 2px solid red; */
+        padding: 5px;
+      }
+    .overall{
+        width: 890px;
+        overflow-y: scroll;
+        padding-bottom: 20px;
+        /* border: 2px solid green; */
+      }
+}
+
+@media only screen and (max-width: 850px){
+    .container{
+        width: 98%;
+    }
+    .result{
+        padding: 0;
+    }
+    .result{
+        height: 50vh;
+        padding: 10px;
+    }
+}
+
+@media only screen and (max-width: 684px){
+    .checkDates .btn{
+        margin-top: 10px;
+      }  
+}
+
+@media only screen and (max-width: 400px){
+    .tool_tip{
+        margin-left: 17%;
+      }  
+}
+
+@media only screen and (max-width: 440px){
+    .checkDates{
+        justify-content: center;
+      }  
+}
+
+@media only screen and (max-width: 700px){
+    .result{
+        width: 98% !important;
+        /* padding: 10px; */
+        overflow-x: scroll;
+        overflow-y: hidden;
+        /* border: 2px solid red; */
+        padding: 5px;
+      }  
+      .overall{
+        width: 700px;
+        overflow-y: scroll;
+        /* border: 2px solid green; */
+      }
+      .forms{
+        width: 100%;
+        overflow-x: hidden;
+      }
+      /* .container{
+        height: min-content;
+      } */
+      .overall{
+        padding-bottom: 20px;
+      }
+}
+
+@media only screen and (max-width: 600px) {
+    .home{
+        display: block;
+    }
+    .container {
+        width: 100vw;
+        height: min-content; 
+       }
+    h2{
+        font-size: 1.5rem;
+    }
+    h3{
+        font-size: 1.3rem;
+    }
+    .login{
+        width: 95vw;
+        height: min-content;
+    }
+    .boxes{
+        flex-direction: column;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    .box1{
+        height: min-content;
+        margin: 5px 0;
+    }
+
+    .box1 h4, .box2 h4{
+        font-size: 1.5rem;
+    }
+
+    .box2{
+        height: min-content;
+        margin: 5px 0;
+        margin-bottom: 0;
+    }
+
+    .color_list{
+        display: flex;
+        flex-direction: column;
+    }
+    
+}
+  

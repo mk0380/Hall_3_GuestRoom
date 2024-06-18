@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>{{title}}</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        p {
+            color: #555;
+        }
+
+        .important-text {
+            color: #e44d26;
+            font-weight: bold;
+        }
+        .closing {
+            font-style: italic;
+            color: #333;
+            line-height: 0.9;
+        }
+        .last{
+            margin-top: 35px;
+            color: #555;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <p>Dear {{name}},</p>
+
+    <p>We regret to inform you that your Guest Room Booking request with the <span class="important-text">ID : {{id}}</span> has been <span class="important-text">rejected</span>.</p>
+
+    <p>The decision was made due to <span class="important-text">{{reason}}</span></p>
+
+
+    <p>Best regards,</p>
+    <p><span class="closing">{{hec_name}} <br>{{hec_position}}<br>Hall Executive Committee<br>Hall of Residence 3</span></p>
+
+
+    <p class="last">Please note that this is an automated email, and responses to this email will not be monitored.</p>
+
+
+</body>
+</html>
