@@ -42,12 +42,12 @@ const RoomsDetails = ({ tabChange, tab }) => {
 
   const getRoomDetails = () => {
     const room =
-      room_details.find((data) => data.no === form.room_details.room_no) || {};
+      room_details?.find((data) => data.no === form.room_details.room_no);
     return room;
   };
 
   const checkNoOfPerson = () => {
-    const { no_of_persons } = form.room_details;
+    const { no_of_persons } = form?.room_details;
     const { max_persons = 0 } = getRoomDetails();
     return no_of_persons > max_persons || no_of_persons <= 0;
   };
@@ -63,14 +63,14 @@ const RoomsDetails = ({ tabChange, tab }) => {
       },
       visitor_details: {
         ...prevForm["visitor_details"],
-        name: [...Array(parseInt(value) || 0)].fill(""),
-        phone: [...Array(parseInt(value) || 0)].fill(""),
-        relationship: [...Array(parseInt(value) || 0)].fill(""),
+        name: [...Array(parseInt(value) ?? 0)].fill(""),
+        phone: [...Array(parseInt(value) ?? 0)].fill(""),
+        relationship: [...Array(parseInt(value) ?? 0)].fill(""),
       },
     }));
   };
 
-  const roomType = getRoomDetails().beds || "";
+  const roomType = getRoomDetails()?.beds ?? "";
 
   useEffect(() => {}, [form]);
 
@@ -79,12 +79,12 @@ const RoomsDetails = ({ tabChange, tab }) => {
       <FormBox>
         <TextField
           label="ROOM NUMBER"
-          value={form?.room_details?.room_no}
+          value={form?.room_details?.room_no ?? ""}
           InputProps={{ readOnly: true }}
         />
         <TextField
           label="ROOM TYPE"
-          value={roomType}
+          value={roomType ?? ""}
           InputProps={{ readOnly: true }}
         />
       </FormBox>

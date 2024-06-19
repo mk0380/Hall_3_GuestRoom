@@ -1,6 +1,6 @@
 // rather than view  use preview or it may unnecessarily ask for permission, even though the link is public
 exports.cancel_room_pdf_link = "https://drive.google.com/file/d/1DwxsTCZfzEVdtUhS7x8DVoDJYJ39mvAz/preview?usp=sharing"
-exports.feedback_form_link = "https://drive.google.com/file/d/1DwxsTCZfzEVdtUhS7x8DVoDJYJ39mvAz/preview?usp=sharing"
+exports.feedback_form_link = "https://forms.gle/m63MF9T5JXg8i3Ux8"
 exports.prices_pdf_link = "https://drive.google.com/file/d/1VOSaIhvCH-Dq4Qp_FjYOH7VdUcm6roY9/preview?usp=drive_link"
 exports.rules_pdf_link = "https://drive.google.com/file/d/1xdI43agz38aWA97FPZ-Ty6mP_7PT_j7a/preview?usp=sharing"
 
@@ -20,7 +20,7 @@ exports.hall_office_email_list = ["mayankkumar8766@gmail.com", "mayankkr21@iitk.
 
 
 // for mail dashboeard redirect link
-exports.frontend_url = "http://localhost:3000"
+exports.frontend_url = "https://hall-3-guest-room.vercel.app/"
 
 
 exports.percentage_price_to_be_paid_for_booking_confirmation = 0.1;

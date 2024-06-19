@@ -1,3 +1,5 @@
+"use client"
+
 import { TextField } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { Button } from "@mui/material";
@@ -11,7 +13,7 @@ import { emailSchema, otpSchema, userSchema } from "@/utils/inputValidation";
 import FormBox2 from "@/components/formBox2";
 
 const ChangePassword = () => {
-  const navigate = useRouter();
+  const router = useRouter();
 
   const [disabled, setDisabled] = useState(false);
   const [newPassword, setNewPassword] = useState("");
@@ -52,8 +54,8 @@ const ChangePassword = () => {
         { otp, email: admin.email, password: newPassword },
         config
       );
-      if (data.success) {
-        navigate.push("/dashboard");
+      if (data?.success) {
+        router.push("/dashboard");
         toast.success(data.message, { toastId: "setPasswordValidateOTP_1" });
       } else {
         toast.error(data.message, { toastId: "setPasswordValidateOTP_2" });
@@ -80,7 +82,7 @@ const ChangePassword = () => {
         config
       );
 
-      if (data.success) {
+      if (data?.success) {
         setDisabled(true);
         toast.success(data.message, { toastId: "setPassword_1" });
       } else {
@@ -101,7 +103,6 @@ const ChangePassword = () => {
           <h2>Change Password</h2>
           <FormBox2>
             <TextField
-              id="outlined-read-only-input"
               label="New Password"
               type="password"
               value={newPassword}
@@ -116,7 +117,7 @@ const ChangePassword = () => {
             <Button
               variant="outlined"
               className="btns"
-              disabled={disabled}
+              disabled={disabled ?? true}
               onClick={passwordChangeHandler}
             >
               Change Password
@@ -124,11 +125,10 @@ const ChangePassword = () => {
           </FormBox2>
           <FormBox2>
             <TextField
-              id="outlined-read-only-input"
               label="OTP"
               type="number"
-              disabled={!disabled}
-              value={otp}
+              disabled={!disabled ?? true}
+              value={otp ?? ""}
               onChange={(ev) => setOTP(ev.target.value)}
               InputProps={{
                 readOnly: false,
@@ -139,7 +139,7 @@ const ChangePassword = () => {
             <Button
               variant="outlined"
               className="btns"
-              disabled={!disabled}
+              disabled={!disabled ?? true}
               onClick={validateOTP}
             >
               Validate OTP

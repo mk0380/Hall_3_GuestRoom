@@ -1,17 +1,15 @@
 "use client";
 
-import { lazy, useEffect, useState, Suspense } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import { useRouter } from "next/router";
 import Heading from "@/components/heading";
-import Loader from "@/components/loader";
-
-const RoomsDetails = lazy(() => import("@/components/roomDetails"));
-const VisitorDetails = lazy(() => import("@/components/visitorDetails"));
-const IndentorDetails = lazy(() => import("@/components/indentorDetails"));
+import RoomsDetails from "@/components/roomDetails";
+import VisitorDetails from "@/components/visitorDetails";
+import IndentorDetails from "@/components/indentorDetails";
 
 const Tabs = () => {
   const router = useRouter();
@@ -49,11 +47,9 @@ const Tabs = () => {
                   <Tab label="Indentor's Details" value="3" />
                 </TabList>
               </Box>
-              <Suspense fallback={<Loader/>}>
                 <RoomsDetails tab={value} tabChange={setValue} />
                 <VisitorDetails tab={value} tabChange={setValue} />
                 <IndentorDetails tab={value} tabChange={setValue} />
-              </Suspense>
             </TabContext>
           </Box>
         </div>

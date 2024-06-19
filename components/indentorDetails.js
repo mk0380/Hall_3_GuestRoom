@@ -11,9 +11,12 @@ import { useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
-import { FormDetails } from "@/context/FormContext";
+import { FormDetails, formInitialState } from "@/context/FormContext";
 import FormBox from "./formBox";
-import { indentor_details_checkbox_1, indentor_details_checkbox_2 } from "@/important_data/important_data";
+import {
+  indentor_details_checkbox_1,
+  indentor_details_checkbox_2,
+} from "@/important_data/important_data";
 
 const IndentorDetails = ({ tabChange, tab }) => {
   const router = useRouter();
@@ -42,20 +45,20 @@ const IndentorDetails = ({ tabChange, tab }) => {
   useEffect(() => {}, [form]);
 
   const checkIndentorField = (name) => {
-    const detail = form?.indentor_details?.[name] || "";
+    const detail = form?.indentor_details?.[name] ?? "";
 
     if (name === "email") {
       return (
-        (detail || "").trim().length === 0 ||
-        (detail || "")
+        (detail ?? "").trim().length === 0 ||
+        (detail ?? "")
           .trim()
-          .substring((detail || "").length - 10, (detail || "").length) !==
+          .substring((detail ?? "").length - 10, (detail ?? "").length) !==
           "iitk.ac.in"
       );
     } else if (name === "phone") {
       return (
-        (detail || "").trim().length === 0 ||
-        (detail || "").trim().length !== 10
+        (detail ?? "").trim().length === 0 ||
+        (detail ?? "").trim().length !== 10
       );
     }
 
@@ -87,7 +90,7 @@ const IndentorDetails = ({ tabChange, tab }) => {
         config
       );
 
-      if (data.success) {
+      if (data.success ?? false) {
         setOtp(true);
         setRequestId(data.id);
         toast.success(data.message, { toastId: "details_1" });
@@ -95,7 +98,9 @@ const IndentorDetails = ({ tabChange, tab }) => {
         toast.error(data.message, { toastId: "details_2" });
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message ?? error.message, { toastId: "details_3" });
+      toast.error(error?.response?.data?.message ?? error.message, {
+        toastId: "details_3",
+      });
     }
   };
 
@@ -114,13 +119,15 @@ const IndentorDetails = ({ tabChange, tab }) => {
         toast.success(data.message, { toastId: "checkOTP_1" });
         setDisableOTP(true);
         localStorage.clear();
+        setForm(formInitialState);
         router.push("/");
-        // router.refresh()
       } else {
         toast.error(data.message, { toastId: "checkOTP_2" });
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message ?? error.message, { toastId: "checkOTP_3" });
+      toast.error(error?.response?.data?.message ?? error.message, {
+        toastId: "checkOTP_3",
+      });
     }
   };
 
@@ -132,10 +139,9 @@ const IndentorDetails = ({ tabChange, tab }) => {
           name="indentor_details.name"
           type="text"
           disabled={otp}
-          value={form?.indentor_details?.name || ""}
+          value={form?.indentor_details?.name ?? ""}
           onChange={changeHandler}
           error={checkIndentorField("name") ?? true}
-          id="outlined-required"
           label="Name"
         />
         <TextField
@@ -143,8 +149,8 @@ const IndentorDetails = ({ tabChange, tab }) => {
           label="Roll No"
           type="number"
           name="indentor_details.roll"
-          disabled={otp}
-          value={form?.indentor_details?.roll || ""}
+          disabled={otp ?? true}
+          value={form?.indentor_details?.roll ?? ""}
           onChange={changeHandler}
           error={checkIndentorField("roll") ?? true}
         />
@@ -155,8 +161,8 @@ const IndentorDetails = ({ tabChange, tab }) => {
           label="Email (IITK)"
           type="email"
           name="indentor_details.email"
-          value={form?.indentor_details?.email || ""}
-          disabled={otp}
+          value={form?.indentor_details?.email ?? ""}
+          disabled={otp ?? true}
           onChange={changeHandler}
           error={checkIndentorField("email") ?? true}
         />
@@ -165,17 +171,17 @@ const IndentorDetails = ({ tabChange, tab }) => {
           label="Phone"
           type="number"
           name="indentor_details.phone"
-          disabled={otp}
-          value={form?.indentor_details?.phone || ""}
+          disabled={otp ?? true}
+          value={form?.indentor_details?.phone ?? ""}
           onChange={changeHandler}
           error={checkIndentorField("phone") ?? true}
         />
       </FormBox>
       <FormBox>
-        <p style={{ margin: "1rem", fontWeight:"600" }}>
+        <p style={{ margin: "1rem", fontWeight: "600" }}>
           Booking request OTP will be send to : <span>&nbsp;</span>
           <span style={{ fontWeight: "bold" }}>
-            {form?.indentor_details?.email || ""}
+            {form?.indentor_details?.email ?? ""}
           </span>
         </p>
       </FormBox>
@@ -187,7 +193,7 @@ const IndentorDetails = ({ tabChange, tab }) => {
             control={
               <Checkbox value={check1} onChange={(_) => setcheck1(!check1)} />
             }
-            label= {indentor_details_checkbox_1}
+            label={indentor_details_checkbox_1}
           />
           <FormControlLabel
             className="info"
@@ -204,8 +210,8 @@ const IndentorDetails = ({ tabChange, tab }) => {
             label="OTP"
             type="text"
             name="otp_password"
-            disabled={disableOTP}
-            value={otp_password}
+            disabled={disableOTP ?? true}
+            value={otp_password ?? ""}
             onChange={(ev) => setOtp_password(ev.target.value)}
             error={otp_password.trim().length === 0 ?? true}
           />
@@ -214,7 +220,7 @@ const IndentorDetails = ({ tabChange, tab }) => {
       <FormBox>
         <Button
           variant="outlined"
-          disabled={otp}
+          disabled={otp ?? true}
           style={{ marginRight: "1rem", marginTop: "0.5rem" }}
           className="btns"
           onClick={(_) => tabChange("2")}
@@ -235,7 +241,7 @@ const IndentorDetails = ({ tabChange, tab }) => {
         {otp && (
           <Button
             variant="outlined"
-            disabled={otp_password?.trim()?.length === 0}
+            disabled={otp_password?.trim()?.length === 0 ?? true}
             style={{ marginTop: "0.5rem" }}
             className="btns"
             onClick={checkOTPHandler}

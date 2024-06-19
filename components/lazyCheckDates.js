@@ -101,7 +101,7 @@ const LazyCheckDates = ({
                     type="radio"
                     key={indx}
                     value={data.no + " " + data.code}
-                    disabled={checkCanBeSelected(indx)}
+                    disabled={checkCanBeSelected(indx) ?? true}
                     name="option"
                     onClick={(ev) =>
                       setDatesState({ ...datesState, room: ev.target.value })

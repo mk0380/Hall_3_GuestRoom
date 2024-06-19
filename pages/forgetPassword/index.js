@@ -15,7 +15,7 @@ import {
 import FormField from "@/components/textField";
 
 const ForgetPassword = () => {
-  const navigate = useRouter();
+  const router = useRouter();
 
   const { checkLoggedIn } = useCheckLoggedIn();
 
@@ -28,18 +28,6 @@ const ForgetPassword = () => {
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [otp, setOTP] = useState("");
-
-  const emailChangeHandler = (ev) => {
-    setEmail(ev.target.value);
-  };
-
-  const otpChangeHandler = (ev) => {
-    setOTP(ev.target.value);
-  };
-
-  const newpasswordChangeHandler = (ev) => {
-    setNewPassword(ev.target.value);
-  };
 
   const config = {
     headers: {
@@ -60,14 +48,16 @@ const ForgetPassword = () => {
         { email },
         config
       );
-      if (data.success) {
+      if (data?.success) {
         setDisabled(false);
-        toast.success(data.message);
+        toast.success(data.message, { toastId: "forgetPassword_1" });
       } else {
-        toast.error(data.message);
+        toast.error(data.message, { toastId: "forgetPassword_2" });
       }
     } catch (error) {
-      toast.error(error.response?.data.message ?? error.message);
+      toast.error(error.response?.data?.message ?? error.message, {
+        toastId: "forgetPassword_3",
+      });
       // all reposonse with status codes outside the range of 2xx will move to the catch block
     }
   };
@@ -87,12 +77,14 @@ const ForgetPassword = () => {
       );
       if (data.success) {
         setOtpcheck(false);
-        toast.success(data.message);
+        toast.success(data.message, { toastId: "validateOTP_1" });
       } else {
-        toast.error(data.message);
+        toast.error(data.message, { toastId: "validateOTP_2" });
       }
     } catch (error) {
-      toast.error(error.response?.data.message ?? error.message);
+      toast.error(error.response?.data?.message ?? error.message, {
+        toastId: "validateOTP_3",
+      });
       // all reposonse with status codes outside the range of 2xx will move to the catch block
     }
   };
@@ -110,14 +102,14 @@ const ForgetPassword = () => {
         { email, newPassword },
         config
       );
-      if (data.success) {
-        navigate.push("/login");
-        toast.success(data.message);
+      if (data?.success) {
+        router.push("/login");
+        toast.success(data.message, { toastId: "passwordChange_1"});
       } else {
-        toast.error(data.message);
+        toast.error(data.message, { toastId: "passwordChange_2"});
       }
     } catch (error) {
-      toast.error(error.response?.data.message ?? error.message);
+      toast.error(error.response?.data?.message ?? error.message, { toastId: "passwordChange_3"});
       // all reposonse with status codes outside the range of 2xx will move to the catch block
     }
   };
@@ -133,9 +125,9 @@ const ForgetPassword = () => {
             label={"Email"}
             type={"email"}
             name={"email"}
-            disabled={!disabled}
-            onChange={emailChangeHandler}
-            value={email}
+            disabled={!disabled ?? true}
+            onChange={(ev) => setEmail(ev.target.value)}
+            value={email ?? ""}
             m={2}
             width={"25ch"}
           />
@@ -148,15 +140,15 @@ const ForgetPassword = () => {
               label={"OTP"}
               type={"number"}
               name={"email"}
-              disabled={disabled}
-              onChange={otpChangeHandler}
+              disabled={disabled ?? true}
+              onChange={(ev) => setOTP(ev.target.value)}
               value={otp}
               m={2}
               width={"25ch"}
             />
           )}
           {otpcheck && (
-            <FormButton onClick={validateOTP} disabled={disabled}>
+            <FormButton onClick={validateOTP} disabled={disabled ?? true}>
               Validate OTP
             </FormButton>
           )}
@@ -166,8 +158,8 @@ const ForgetPassword = () => {
               label={"New Password"}
               type={"password"}
               name={"password"}
-              onChange={newpasswordChangeHandler}
-              value={newPassword}
+              onChange={(ev) => setNewPassword(ev.target.value)}
+              value={newPassword ?? ""}
               m={2}
               width={"25ch"}
             />

@@ -12,7 +12,7 @@ import FormField from "@/components/textField";
 import useCheckLoggedIn from "@/utils/checkLoggedIn";
 
 const Register = () => {
-  const naviagte = useRouter();
+  const router = useRouter();
 
   const { checkLoggedIn } = useCheckLoggedIn();
 
@@ -46,8 +46,8 @@ const Register = () => {
         strict: true,
       });
       const { data } = await axios.post("/api/register", user, config);
-      if (data.success) {
-        naviagte.push("/dashboard");
+      if (data?.success) {
+        router.push("/dashboard");
         toast.success(data.message, { toastId: "register_1" });
       } else {
         toast.error(data.message, { toastId: "register_2" });

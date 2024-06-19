@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useContext } from "react";
 import { Box, Button, IconButton, Modal, TextField } from "@mui/material";
 import MaterialTable from "material-table";
@@ -7,9 +9,10 @@ import { useRouter } from "next/router";
 import { LoggedInUser } from "@/context/UserContext";
 import useCheckLoggedIn from "@/utils/checkLoggedIn";
 import { code_hall_office, code_warden } from "@/important_data/important_data";
+import Heading from "@/components/heading";
 
 const Dashboard = () => {
-  const navigate = useRouter();
+  const router = useRouter();
 
   const { admin } = useContext(LoggedInUser);
 
@@ -34,7 +37,7 @@ const Dashboard = () => {
   const [reason, setReason] = useState("");
 
   const initializeUser = async () => {
-    await checkLoggedIn('/login','/dashboard');
+    await checkLoggedIn("/login", "/dashboard");
   };
 
   const fetchData = async () => {
@@ -43,11 +46,11 @@ const Dashboard = () => {
 
       let filteredData = [];
       if (admin?.role === code_warden) {
-        filteredData = data.allData.filter(
+        filteredData = data?.allData?.filter(
           (item) => item.approvalLevel === "1"
         );
       } else if (admin?.role === code_hall_office) {
-        filteredData = data.allData.filter(
+        filteredData = data?.allData?.filter(
           (item) =>
             item.approvalLevel === "2" ||
             item.approvalLevel === "3" ||
@@ -58,7 +61,9 @@ const Dashboard = () => {
 
       setTableData([...filteredData]);
     } catch (error) {
-      toast.error(error.message, { toastId: "fetchData_1" });
+      toast.error(error.response?.data?.message ?? error.message, {
+        toastId: "fetchData_1",
+      });
     }
   };
 
@@ -74,14 +79,14 @@ const Dashboard = () => {
     try {
       const { data } = await axios.get("/api/logout");
 
-      if (data.success) {
+      if (data?.success) {
         toast.success(data.message, { toastId: "logout_1" });
-        navigate.push("/login");
+        router.push("/login");
       } else {
         toast.error(data.message, { toastId: "logout_2" });
       }
     } catch (error) {
-      toast.error(error.message, { toastId: "logout_3" });
+      toast.error(error.response?.data?.message ?? error.message, { toastId: "logout_3" });
     }
   };
 
@@ -102,7 +107,7 @@ const Dashboard = () => {
 
   const acceptHandle = async () => {
     try {
-      const booking_id = modalData.bookingId;
+      const booking_id = modalData?.bookingId ?? "";
 
       const { data } = await axios.put(
         "/api/wardenApproval",
@@ -110,20 +115,20 @@ const Dashboard = () => {
         config
       );
 
-      if (data.success) {
+      if (data?.success) {
         toast.success(data.message, { toastId: "wardenApproval_1" });
         setOpen(!open);
       } else {
         toast.error(data.message, { toastId: "wardenApproval_2" });
       }
     } catch (error) {
-      toast.error(error.message, { toastId: "wardenApproval_3" });
+      toast.error(error.response?.data?.message ?? error.message, { toastId: "wardenApproval_3" });
     }
   };
 
   const hallApproval = async () => {
     try {
-      const booking_id = modalData.bookingId;
+      const booking_id = modalData?.bookingId ?? "";
 
       const { data } = await axios.put(
         "/api/hallApproval",
@@ -131,14 +136,14 @@ const Dashboard = () => {
         config
       );
 
-      if (data.success) {
-        toast.success(data.message, {toastId: "hallApproval_1"});
+      if (data?.success) {
+        toast.success(data.message, { toastId: "hallApproval_1" });
         setOpen(!open);
       } else {
-        toast.error(data.message, {toastId: "hallApproval_2"});
+        toast.error(data.message, { toastId: "hallApproval_2" });
       }
     } catch (error) {
-      toast.error(error.message, { toastId: "hallApproval_3" });
+      toast.error(error.response?.data?.message ?? error.message, { toastId: "hallApproval_3" });
     }
   };
 
@@ -146,7 +151,7 @@ const Dashboard = () => {
     try {
       setChildModal(false);
 
-      const booking_id = modalData.bookingId;
+      const booking_id = modalData?.bookingId ?? "";
       const { data } = await axios.put(
         "/api/wardenRejection",
         { booking_id, reason },
@@ -155,14 +160,14 @@ const Dashboard = () => {
 
       setOpen(false);
 
-      if (data.success) {
+      if (data?.success) {
         toast.success(data.message, { toastId: "wardenRejection_1" });
       } else {
         toast.error(data.message, { toastId: "wardenRejection_2" });
       }
       setReason("");
     } catch (error) {
-      toast.error(error.message, { toastId: "wardenRejection_3" });
+      toast.error(error.response?.data?.message ?? error.message, { toastId: "wardenRejection_3" });
     }
   };
 
@@ -334,13 +339,11 @@ const Dashboard = () => {
   return (
     <div className="home">
       <div className="container">
-        <h2>Guest Room Booking Portal</h2>
-        <h3>HALL OF RESIDENCE III</h3>
-        <hr />
+        <Heading/>
         <div className="tab">
           <div>
             <Button
-              onClick={() => navigate.push("/changePassword")}
+              onClick={() => router.push("/changePassword")}
               className="btns"
             >
               Change Password
@@ -354,7 +357,6 @@ const Dashboard = () => {
         </div>
         <div className="table">
           <MaterialTable
-            // key={JSON.stringify(tableData)}
             onRowClick={(_, rowData) =>
               setModalData((prevData) => ({ ...prevData, ...rowData }))
             }
@@ -389,40 +391,40 @@ const Dashboard = () => {
             <Box sx={{ ...style }}>
               <h4 className="modal_heading">Room Details</h4>
               <div className="modal_content">
-                <p>Room Number : {modalData.roomDetails.roomNo}</p>
-                <p>Room Type : {modalData.roomDetails.roomType}</p>
-                <p>Arrival Date : {modalData.arrivalDate}</p>
-                <p>Departure Date : {modalData.departureDate}</p>
+                <p>Room Number : {modalData?.roomDetails?.roomNo ?? ""}</p>
+                <p>Room Type : {modalData?.roomDetails?.roomType ?? ""}</p>
+                <p>Arrival Date : {modalData?.arrivalDate ?? ""}</p>
+                <p>Departure Date : {modalData?.departureDate ?? ""}</p>
               </div>
 
               <hr style={{ width: "90%" }} />
 
               <h4 className="modal_heading">Visitor Details</h4>
-              {modalData.visitorDetails.map((_, indx) => {
+              {modalData?.visitorDetails.map((_, indx) => {
                 return (
                   <div className="modal_content" key={indx}>
-                    <p>Name : {modalData.visitorDetails[indx].name}</p>
-                    <p>Mobile : {modalData.visitorDetails[indx].phone}</p>
+                    <p>Name : {modalData?.visitorDetails[indx]?.name ?? ""}</p>
+                    <p>Mobile : {modalData?.visitorDetails[indx]?.phone ?? ""}</p>
                     <p>
                       Relationship :{" "}
-                      {modalData.visitorDetails[indx].relationship}
+                      {modalData?.visitorDetails[indx]?.relationship ?? ""}
                     </p>
                   </div>
                 );
               })}
 
               <div className="modal_content">
-                Purpose of Visit: {modalData.purposeOfVisit}
+                Purpose of Visit: {modalData?.purposeOfVisit ?? ""}
               </div>
 
               <hr style={{ width: "90%" }} />
 
               <h4 className="modal_heading">Indentor Details</h4>
               <div className="modal_content">
-                <p>Name : {modalData.indentorDetails.name}</p>
-                <p>Roll : {modalData.indentorDetails.roll}</p>
-                <p>Email : {modalData.indentorDetails.email}</p>
-                <p>Phone : {modalData.indentorDetails.phone}</p>
+                <p>Name : {modalData?.indentorDetails?.name ?? ""}</p>
+                <p>Roll : {modalData?.indentorDetails?.roll ?? ""}</p>
+                <p>Email : {modalData?.indentorDetails?.email ?? ""}</p>
+                <p>Phone : {modalData?.indentorDetails?.phone ?? ""}</p>
               </div>
 
               <hr style={{ width: "90%" }} />
@@ -484,11 +486,10 @@ const Dashboard = () => {
                 autoComplete="off"
               >
                 <TextField
-                  id="outlined-read-only-input"
                   style={{ width: "100%" }}
                   label="Type Here...."
                   type="text"
-                  value={reason}
+                  value={reason ?? ""}
                   onChange={(ev) => setReason(ev.target.value)}
                   InputProps={{
                     readOnly: false,

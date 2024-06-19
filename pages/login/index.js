@@ -13,7 +13,7 @@ import useCheckLoggedIn from "@/utils/checkLoggedIn";
 import { wrong_credentials } from "@/important_data/important_data";
 
 const Login = () => {
-  const naviagte = useRouter();
+  const router = useRouter();
 
   const { checkLoggedIn } = useCheckLoggedIn();
 
@@ -47,8 +47,8 @@ const Login = () => {
         strict: true,
       });
       const { data } = await axios.post("/api/login", user, config);
-      if (data.success) {
-        naviagte.push("/dashboard");
+      if (data?.success) {
+        router.push("/dashboard");
         toast.success(data.message, { toastId: "login_1" });
       } else {
         toast.error(data.message, { toastId: "login_2" });

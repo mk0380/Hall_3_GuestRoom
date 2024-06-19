@@ -54,11 +54,11 @@ const VisitorDetails = ({ tabChange, tab }) => {
     const detailsArray = form?.visitor_details?.[name];
 
     if (indx === undefined) {
-      const data = detailsArray || "";
+      const data = detailsArray ?? "";
       return validateField(name, data);
     }
 
-    const value = detailsArray[indx] || "";
+    const value = detailsArray[indx] ?? "";
     return validateField(name, value);
   };
 
@@ -85,7 +85,7 @@ const VisitorDetails = ({ tabChange, tab }) => {
   return (
     <div className={"" + (tab === "1" || tab === "3" ? "hidden" : "")}>
       <FormBox widthTop={"30ch"}>
-        {[...Array(parseInt(form?.room_details?.no_of_persons) || 0)].map(
+        {[...Array(parseInt(form?.room_details?.no_of_persons))]?.map(
           (_, indx) => (
             <TextField
               key={indx}
@@ -94,7 +94,7 @@ const VisitorDetails = ({ tabChange, tab }) => {
               name="name"
               type="text"
               label={`Person ${indx + 1} Name`}
-              value={form?.visitor_details?.name[indx] || ""}
+              value={form?.visitor_details?.name[indx] ?? ""}
               onChange={changeHandler}
               error={!checkVisitorField("name", indx) ?? true}
             />
@@ -103,7 +103,7 @@ const VisitorDetails = ({ tabChange, tab }) => {
       </FormBox>
 
       <FormBox widthTop={"30ch"}>
-        {[...Array(parseInt(form?.room_details?.no_of_persons) || 0)].map(
+        {[...Array(parseInt(form?.room_details?.no_of_persons))]?.map(
           (_, indx) => (
             <TextField
               key={indx}
@@ -112,7 +112,7 @@ const VisitorDetails = ({ tabChange, tab }) => {
               name="phone"
               type="number"
               label={`Phone: Person ${indx + 1}`}
-              value={form?.visitor_details?.phone[indx] || ""}
+              value={form?.visitor_details?.phone[indx] ?? ""}
               onChange={changeHandler}
               error={!checkVisitorField("phone", indx) ?? true}
             />
@@ -122,19 +122,18 @@ const VisitorDetails = ({ tabChange, tab }) => {
 
       <FormBox widthTop={"30ch"}>
         <TextField
-          id="outlined-number"
           label="Purpose of Visit"
           type="text"
           name="purpose"
           required
-          value={form?.visitor_details?.purpose || ""}
+          value={form?.visitor_details?.purpose ?? ""}
           onChange={changeHandler}
           error={!checkVisitorField("purpose", undefined) ?? true}
         />
       </FormBox>
 
       <FormBox widthTop={"30ch"}>
-        {[...Array(parseInt(form?.room_details?.no_of_persons) || 0)].map(
+        {[...Array(parseInt(form?.room_details?.no_of_persons))]?.map(
           (_, indx) => (
             <TextField
               key={indx}
@@ -162,7 +161,7 @@ const VisitorDetails = ({ tabChange, tab }) => {
         </Button>
         <Button
           variant="outlined"
-          disabled={!isFormValid()}
+          disabled={!isFormValid() ?? true}
           className="btns"
           onClick={(_) => tabChange("3")}
         >

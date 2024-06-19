@@ -2,7 +2,6 @@ import React from "react";
 import { Box, TextField } from "@mui/material";
 
 const FormField = ({
-  id,
   label,
   type,
   name,
@@ -27,7 +26,6 @@ const FormField = ({
       autoComplete="off"
     >
       <TextField
-        id={id}
         label={label}
         type={type}
         name={name}

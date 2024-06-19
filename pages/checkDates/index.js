@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, lazy, Suspense } from "react";
+import { useState } from "react";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -14,12 +14,9 @@ import {
   room_details,
 } from "@/important_data/important_data";
 import { toast } from "react-toastify";
-import Loader from "@/components/loader";
-
-const LazyCheckDates = lazy(() => import("@/components/lazyCheckDates"));
+import LazyCheckDates from "@/components/lazyCheckDates";
 
 const CheckDates = () => {
-  
   // R1 R2  ... of a particular date   -1 = Red = booked, 0  = yellow = reserved, 1 = green = available
   const [datesState, setDatesState] = useState({
     arrivalDate: null,
@@ -67,7 +64,7 @@ const CheckDates = () => {
         config
       );
 
-      if (data.success) {
+      if (data?.success) {
         setDatesState({
           ...datesState,
           colorList: data.payload.color,
@@ -80,7 +77,7 @@ const CheckDates = () => {
         toast.error(data.message, { toastId: "check_dates_1" });
       }
     } catch (error) {
-      toast.error(error.message, { toastId: "check_dates_2" });
+      toast.error(error.response?.data?.message ?? error.message, { toastId: "check_dates_2" });
     }
   };
 
@@ -91,7 +88,6 @@ const CheckDates = () => {
     router.push("/formFillup");
   };
 
-  const unique_room = room_details
 
   return (
     <div className="home checkDatesSection">
@@ -123,7 +119,7 @@ const CheckDates = () => {
           </LocalizationProvider>
           <Button
             variant="outlined"
-            disabled={checkDateSpan()}
+            disabled={checkDateSpan() ?? true}
             className="btn btns"
             onClick={checkStatus}
           >
@@ -131,9 +127,15 @@ const CheckDates = () => {
           </Button>
         </div>
 
-        <Suspense fallback={<Loader />}>
-          <LazyCheckDates display={display} routing={routing} setDatesState={setDatesState} room={room} datesColor={datesColor} colorList={colorList} datesState={datesState}/>
-        </Suspense>
+        <LazyCheckDates
+          display={display}
+          routing={routing}
+          setDatesState={setDatesState}
+          room={room}
+          datesColor={datesColor}
+          colorList={colorList}
+          datesState={datesState}
+        />
       </div>
     </div>
   );

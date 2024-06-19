@@ -1,6 +1,8 @@
 "use client";
 
 const IframeLoader = ({ pdf_link, loading, setLoading }) => {
+
+  
   return (
     <iframe
       src={pdf_link}
