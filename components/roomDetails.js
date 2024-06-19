@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { Button } from "@mui/material";
@@ -16,6 +16,7 @@ import FormBox from "./formBox";
 
 const RoomsDetails = ({ tabChange, tab }) => {
   const { form, setForm } = useContext(FormDetails);
+  const [roomData, setRoomData] = useState(null);
 
   useEffect(() => {
     const arrivalDateFromStorage = localStorage.getItem("arrivalDate");
@@ -40,20 +41,30 @@ const RoomsDetails = ({ tabChange, tab }) => {
     }
   }, [setForm]);
 
-  const getRoomDetails = () => {
-    const room =
-      room_details?.find((data) => data.no === form.room_details.room_no);
-    return room;
-  };
+  useEffect(() => {
+    const fetchRoomDetails = async () => {
+      const room = room_details?.find(
+        (data) => data.no === form.room_details.room_no
+      );
+      setRoomData(room);
+    };
 
-  const checkNoOfPerson = () => {
-    const { no_of_persons } = form?.room_details;
-    const { max_persons = 0 } = getRoomDetails();
-    return no_of_persons > max_persons || no_of_persons <= 0;
-  };
+    fetchRoomDetails();
+  }, [roomData]);
 
   const changeHandler = (ev) => {
-    const { name, value } = ev.target;
+    let { name, value } = ev.target;
+    let nameArr = [""],
+      phoneArr = [""],
+      relationshipArr = [""];
+    if (value && value > 0) {
+      nameArr = [...Array(parseInt(value))].fill("");
+      phoneArr = [...Array(parseInt(value))].fill("");
+      relationshipArr = [...Array(parseInt(value))].fill("");
+    }
+    if(value < 0){
+      return
+    }
     const [section, key] = name.split(".");
     setForm((prevForm) => ({
       ...prevForm,
@@ -63,16 +74,22 @@ const RoomsDetails = ({ tabChange, tab }) => {
       },
       visitor_details: {
         ...prevForm["visitor_details"],
-        name: [...Array(parseInt(value) ?? 0)].fill(""),
-        phone: [...Array(parseInt(value) ?? 0)].fill(""),
-        relationship: [...Array(parseInt(value) ?? 0)].fill(""),
+        name: nameArr,
+        phone: phoneArr,
+        relationship: relationshipArr,
       },
     }));
   };
 
-  const roomType = getRoomDetails()?.beds ?? "";
-
   useEffect(() => {}, [form]);
+
+  const roomType = roomData?.beds ?? "";
+
+  const checkNoOfPerson = () => {
+    const { no_of_persons } = form?.room_details;
+    const max_persons = roomData?.max_persons ?? 0;
+    return no_of_persons > max_persons || no_of_persons <= 0;
+  };
 
   return (
     <div className={tab === "3" || tab === "2" ? "hidden" : ""}>
@@ -122,9 +139,7 @@ const RoomsDetails = ({ tabChange, tab }) => {
           className="tool_tip"
         >
           <Tooltip
-            title={`${max_number_persons_message} ${
-              getRoomDetails().max_persons ?? 0
-            }.`}
+            title={`${max_number_persons_message} ${roomData?.max_persons}.`}
             arrow
           >
             <IconButton>

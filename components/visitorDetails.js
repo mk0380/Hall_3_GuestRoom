@@ -85,7 +85,7 @@ const VisitorDetails = ({ tabChange, tab }) => {
   return (
     <div className={"" + (tab === "1" || tab === "3" ? "hidden" : "")}>
       <FormBox widthTop={"30ch"}>
-        {[...Array(parseInt(form?.room_details?.no_of_persons))]?.map(
+        {[...Array(parseInt(form?.room_details?.no_of_persons || 1))]?.map(
           (_, indx) => (
             <TextField
               key={indx}
@@ -103,7 +103,7 @@ const VisitorDetails = ({ tabChange, tab }) => {
       </FormBox>
 
       <FormBox widthTop={"30ch"}>
-        {[...Array(parseInt(form?.room_details?.no_of_persons))]?.map(
+        {[...Array(parseInt(form?.room_details?.no_of_persons || 1))]?.map(
           (_, indx) => (
             <TextField
               key={indx}
@@ -133,7 +133,7 @@ const VisitorDetails = ({ tabChange, tab }) => {
       </FormBox>
 
       <FormBox widthTop={"30ch"}>
-        {[...Array(parseInt(form?.room_details?.no_of_persons))]?.map(
+        {[...Array(parseInt(form?.room_details?.no_of_persons || 1))]?.map(
           (_, indx) => (
             <TextField
               key={indx}
