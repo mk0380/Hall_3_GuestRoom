@@ -37,7 +37,7 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
-    "eslint": "^8",
+    "eslint": "^8.57.0",
     "eslint-config-next": "14.2.3"
   }
 }
