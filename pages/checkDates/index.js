@@ -37,6 +37,7 @@ const CheckDates = () => {
       const d1 = dayjs(arrivalDate);
       const d2 = dayjs(departureDate);
       const today = dayjs();
+
       const noOfDays = d2.diff(d1, "day");
       if (
         noOfDays > max_booking_day_period ||

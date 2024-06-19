@@ -13,6 +13,12 @@ const {
 const responseHandler = require("@/utils/responseHandler");
 const moment = require("moment");
 const dayjs = require("dayjs");
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault('Asia/Kolkata');
 
 const checkDates = async (req, res) => {
   try {
@@ -39,10 +45,13 @@ const checkDates = async (req, res) => {
       return responseHandler(res, false, 400, validation_error(error.message));
     }
 
-    const d1 = dayjs(arrivalDate);
-    const d2 = dayjs(departureDate);
-    const today = dayjs();
+    const d1 = dayjs(arrivalDate).tz();
+    const d2 = dayjs(departureDate).tz();
+    const today = dayjs().tz();
     const noOfDays = d2.diff(d1, "day");
+
+    // console.log(d1);
+    // console.log(d2);
 
     if (
       noOfDays > max_booking_day_period ||
