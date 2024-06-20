@@ -13,12 +13,12 @@ const {
 const responseHandler = require("@/utils/responseHandler");
 const moment = require("moment");
 const dayjs = require("dayjs");
-const utc = require('dayjs/plugin/utc');
-const timezone = require('dayjs/plugin/timezone');
+// const utc = require('dayjs/plugin/utc');
+// const timezone = require('dayjs/plugin/timezone');
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
-dayjs.tz.setDefault('Asia/Kolkata');
+// dayjs.extend(utc);
+// dayjs.extend(timezone);
+// dayjs.tz.setDefault('Asia/Kolkata');
 
 const checkDates = async (req, res) => {
   try {
@@ -45,13 +45,10 @@ const checkDates = async (req, res) => {
       return responseHandler(res, false, 400, validation_error(error.message));
     }
 
-    const d1 = dayjs(arrivalDate).tz();
-    const d2 = dayjs(departureDate).tz();
-    const today = dayjs().tz();
+    const d1 = dayjs(arrivalDate)
+    const d2 = dayjs(departureDate)
+    const today = dayjs()
     const noOfDays = d2.diff(d1, "day");
-
-    // console.log(d1);
-    // console.log(d2);
 
     if (
       noOfDays > max_booking_day_period ||
@@ -61,8 +58,10 @@ const checkDates = async (req, res) => {
       return responseHandler(res, false, 401, date_incorrcet);
     }
 
-    arrivalDate = moment(arrivalDate);
+    arrivalDate = moment(arrivalDate)
     departureDate = moment(departureDate);
+
+    // console.log('arrival Date', arrivalDate);
 
     await connectDB(res);
 
