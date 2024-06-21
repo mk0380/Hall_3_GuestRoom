@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Loader from "@/components/loader";
+import { wrongURL_redirect_timer } from "@/important_data/important_data";
 
 const PageNotFound = () => {
   const navigate = useRouter();
@@ -11,7 +12,7 @@ const PageNotFound = () => {
     const timeout = setTimeout(() => {
       navigate.push("/");
       clearTimeout(timeout);
-    }, 4000);
+    }, wrongURL_redirect_timer);
   }, []);
 
   return <Loader />;

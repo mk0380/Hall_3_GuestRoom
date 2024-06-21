@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { rate_limit_msg, rate_limit_request, rate_limit_time } from './important_data/important_data';
 
 // sliding window concept
 
@@ -6,8 +7,8 @@ import { NextResponse } from 'next/server';
 const idToRequestCount = new Map();
 const rateLimiter = {
   windowStart: Date.now(),
-  windowSize: 10000, // 10 seconds
-  maxRequests: 10,
+  windowSize: rate_limit_time, // time
+  maxRequests: rate_limit_request, // number of maximum request in the given period of time possible
 };
 
 const limit = (ip) => {
@@ -31,7 +32,7 @@ export function middleware(request) {
 
   if (isRateLimited) {
     return new NextResponse(
-      JSON.stringify({ success:false, message: 'Rate limit exceeded. Please try again in 5 minutes.' }),
+      JSON.stringify({ success:false, message: rate_limit_msg }),
       { status: 429, headers: { 'Content-Type': 'application/json' } }
     );
   }

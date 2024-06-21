@@ -113,6 +113,15 @@ exports.indentor_details_checkbox_1 = "I will be held responsible if any of thes
 exports.indentor_details_checkbox_2 = "I declare my complete responsibility for the conduct of my guests throughout their stay in the Guest Room. I, hereby, submit to bear the consequences of any misconduct or damage on the part of my guest during their stay in the Guest Room."
 
 
+exports.rate_limit_request = 10;
+exports.rate_limit_time = 10;
+exports.rate_limit_msg = 'Rate limit exceeded. Please try again in few minutes.';
+
+
+exports.toast_timer = 10000 //in ms
+exports.wrongURL_redirect_timer = 4000 //inms
+
+
 // messages to dispaly to user, register page
 exports.token_verified = "Token verified successfully";
 exports.invalid_or_expired_token = "Invalid or expired token";

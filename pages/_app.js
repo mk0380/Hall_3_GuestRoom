@@ -1,5 +1,6 @@
 import FormContext from "@/context/FormContext";
 import UserContext from "@/context/UserContext";
+import { toast_timer } from "@/important_data/important_data";
 import "@/styles/app.css";
 import "@/styles/mediaQuery.css";
 import Head from "next/head";
@@ -17,7 +18,7 @@ export default function App({ Component, pageProps }) {
           <Component {...pageProps} />
         </UserContext>
       </FormContext>
-      <ToastContainer />
+      <ToastContainer autoClose={toast_timer}/>
     </>
   );
 }
