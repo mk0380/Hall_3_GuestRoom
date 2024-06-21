@@ -7,7 +7,7 @@ const idToRequestCount = new Map();
 const rateLimiter = {
   windowStart: Date.now(),
   windowSize: 10000, // 10 seconds
-  maxRequests: 100,
+  maxRequests: 10,
 };
 
 const limit = (ip) => {
