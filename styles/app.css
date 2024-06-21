@@ -29,7 +29,7 @@
     rgb(213, 220, 226)
     rgb(184, 194, 204);
     /* border: 2px solid red; */
-    background-image: url('../public/hall3.webp');
+    background-image: url('/hall3.webp');
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
