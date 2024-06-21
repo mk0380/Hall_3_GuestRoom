@@ -1,24 +1,25 @@
+import schemaValidator from "@/utils/schemaValidator";
+
 const guestRoom = require("@/models/BookingDetails");
 const connectDB = require("@/utils/connectDB");
 const { dateSchema } = require("@/utils/inputValidation");
 const {
   internal_server_error,
   invalid_request_method,
-  validation_error,
   room_details,
   max_booking_day_period,
   date_incorrcet,
   error_occurred,
 } = require("@/important_data/important_data");
 const responseHandler = require("@/utils/responseHandler");
-const moment = require("moment");
+const moment = require("moment-timezone");
 const dayjs = require("dayjs");
-// const utc = require('dayjs/plugin/utc');
-// const timezone = require('dayjs/plugin/timezone');
+const utc = require("dayjs/plugin/utc");
+const timezone = require("dayjs/plugin/timezone");
 
-// dayjs.extend(utc);
-// dayjs.extend(timezone);
-// dayjs.tz.setDefault('Asia/Kolkata');
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Asia/Kolkata");
 
 const checkDates = async (req, res) => {
   try {
@@ -28,26 +29,21 @@ const checkDates = async (req, res) => {
 
     let { arrivalDate, departureDate } = req.body;
 
-    try {
-      await dateSchema.validate(
-        { date: arrivalDate },
-        {
-          strict: true,
-        }
-      );
-      await dateSchema.validate(
-        { date: departureDate },
-        {
-          strict: true,
-        }
-      );
-    } catch (error) {
-      return responseHandler(res, false, 400, validation_error(error.message));
-    }
+    arrivalDate = dayjs
+      .tz(arrivalDate, "UTC")
+      .tz("Asia/Kolkata")
+      .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+    departureDate = dayjs
+      .tz(departureDate, "UTC")
+      .tz("Asia/Kolkata")
+      .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
 
-    const d1 = dayjs(arrivalDate)
-    const d2 = dayjs(departureDate)
-    const today = dayjs()
+    await schemaValidator(dateSchema, "date", arrivalDate, res);
+    await schemaValidator(dateSchema, "date", departureDate, res);
+
+    const d1 = dayjs.tz(arrivalDate, "Asia/Kolkata");
+    const d2 = dayjs.tz(departureDate, "Asia/Kolkata");
+    const today = dayjs().tz("Asia/Kolkata");
     const noOfDays = d2.diff(d1, "day");
 
     if (
@@ -58,10 +54,8 @@ const checkDates = async (req, res) => {
       return responseHandler(res, false, 401, date_incorrcet);
     }
 
-    arrivalDate = moment(arrivalDate)
-    departureDate = moment(departureDate);
-
-    // console.log('arrival Date', arrivalDate);
+    arrivalDate = moment(arrivalDate).tz("Asia/Kolkata");
+    departureDate = moment(departureDate).tz("Asia/Kolkata");
 
     await connectDB(res);
 
@@ -74,37 +68,56 @@ const checkDates = async (req, res) => {
     }
 
     const arrivalDates = allBookings.map((booking) =>
-      moment(booking.arrivalDate, "DD/MM/YYYY", true)
+      moment(booking.arrivalDate, "DD/MM/YYYY", true).tz("Asia/Kolkata")
     );
+
     const departureDates = allBookings.map((booking) =>
-      moment(booking.departureDate, "DD/MM/YYYY", true)
+      moment(booking.departureDate, "DD/MM/YYYY", true).tz("Asia/Kolkata")
     );
+
     const roomNos = allBookings.map((booking) => booking.roomDetails.roomNo);
+
     const approvalLevel = allBookings.map((booking) => booking.approvalLevel);
 
     let colorList = [];
     let dates = [];
 
+    const roomIndexMap = room_details.reduce((map, room, index) => {
+      map[room.no] = index;
+      return map;
+    }, {});
+
     while (arrivalDate.isSameOrBefore(departureDate)) {
-      const date = arrivalDate.format("DD/MM/YYYY");
+      const date = arrivalDate.tz("Asia/Kolkata").format("DD/MM/YYYY");
+      const color = new Array(room_details?.length).fill("1");
 
       dates.push(
         date.substring(0, date.length - 4) +
           date.substring(date.length - 2, date.length)
       );
 
-      const color = new Array(room_details?.length).fill("1");
-
       for (let index = 0; index < arrivalDates.length; index++) {
-        if (
-          arrivalDates[index].isValid() &&
-          departureDates[index].isValid() &&
-          arrivalDates[index].isSameOrBefore(arrivalDate) &&
-          departureDates[index].isSameOrAfter(arrivalDate)
-        ) {
-          const roomIndex = roomNos.indexOf(roomNos[index]);
+        const formattedArrivalDate = moment(
+          arrivalDates[index],
+          "DD/MM/YYYY",
+          true
+        );
+        const formattedDepartureDate = moment(
+          departureDates[index],
+          "DD/MM/YYYY",
+          true
+        );
+        const formattedDate = moment(date, "DD/MM/YYYY", true);
 
-          if (roomIndex !== -1) {
+        if (
+          formattedArrivalDate.isValid() &&
+          formattedDate.isValid() &&
+          formattedDepartureDate.isValid() &&
+          formattedArrivalDate.isSameOrBefore(formattedDate) &&
+          formattedDepartureDate.isSameOrAfter(formattedDate)
+        ) {
+          const roomIndex = roomIndexMap[roomNos[index]];
+          if (roomIndex !== undefined) {
             if (approvalLevel[index] === "1" || approvalLevel[index] === "2") {
               color[roomIndex] = "0";
             } else if (
@@ -116,21 +129,24 @@ const checkDates = async (req, res) => {
           }
         }
       }
-
       colorList.push(color);
-      arrivalDate.add(1, "day");
+      arrivalDate = arrivalDate.tz("Asia/Kolkata").add(1, "day");
     }
 
     const payload = {
-      arrivalDate: moment(req.body.arrivalDate).format("DD/MM/YYYY"),
-      departureDate: moment(req.body.departureDate).format("DD/MM/YYYY"),
+      arrivalDate: moment(req.body.arrivalDate)
+        .tz("Asia/Kolkata")
+        .format("DD/MM/YYYY"),
+      departureDate: moment(req.body.departureDate)
+        .tz("Asia/Kolkata")
+        .format("DD/MM/YYYY"),
       color: colorList,
       dates,
     };
 
     return responseHandler(res, true, 200, "", payload);
   } catch (error) {
-    console.log(`Error occured while checking dates: ${error.message}`);
+    console.log(`Error occured while checking dates: ${error}`);
     return responseHandler(res, false, 500, internal_server_error);
   }
 };

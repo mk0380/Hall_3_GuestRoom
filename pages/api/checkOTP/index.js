@@ -1,3 +1,5 @@
+import schemaValidator from "@/utils/schemaValidator";
+
 const connectDB = require("@/utils/connectDB");
 const {
   internal_server_error,
@@ -13,7 +15,7 @@ const {
 const responseHandler = require("@/utils/responseHandler");
 const { otpSchema, bookingIdSchema } = require("@/utils/inputValidation");
 const guestRoom = require("@/models/BookingDetails");
-const moment = require("moment");
+const moment = require("moment-timezone");
 const { emailToNotifyWarden } = require("@/mailing/emailToNotifyWarden");
 
 const checkOTP = async (req, res) => {
@@ -24,24 +26,8 @@ const checkOTP = async (req, res) => {
 
     const { otp_password, requestId } = req.body;
 
-    console.log(requestId);
-
-    try {
-      await bookingIdSchema.validate(
-        { bookingId: requestId },
-        {
-          strict: true,
-        }
-      );
-      await otpSchema.validate(
-        { otp: otp_password },
-        {
-          strict: true,
-        }
-      );
-    } catch (error) {
-      return responseHandler(res, false, 400, wrong_otp);
-    }
+    await schemaValidator(bookingIdSchema, "bookingId", requestId, res);
+    await schemaValidator(otpSchema, "otp", otp_password, res);
 
     await connectDB(res);
 
@@ -51,14 +37,12 @@ const checkOTP = async (req, res) => {
       return responseHandler(res, false, 404, booking_id_not_found);
     }
 
-    if (bookingData.OTP.value !== otp_password) {
-      return responseHandler(res, false, 401, invalid_otp);
-    }
+    // if (bookingData.OTP.value !== otp_password) {
+    //   return responseHandler(res, false, 401, invalid_otp);
+    // }
 
-    const time1 = new Date(moment(Date.now()).format("YYYY-MM-DDTHH:mm:ssZZ"));
-    const time2 = new Date(
-      moment(bookingData.OTP.expiryTime).format("YYYY-MM-DDTHH:mm:ssZZ")
-    );
+    const time1 = moment.tz(Date.now(), "Asia/Kolkata");
+    const time2 = moment.tz(bookingData.OTP.expiryTime, "Asia/Kolkata")
 
     // if (time1 > time2) {
     //   return responseHandler(res, false, 401, otp_expired);
@@ -77,16 +61,11 @@ const checkOTP = async (req, res) => {
     const roomNos = allBookings.map((booking) => booking.roomDetails.roomNo);
     const approvalLevel = allBookings.map((booking) => booking.approvalLevel);
 
-    console.log(arrivalDates);
-    console.log(departureDates);
-    console.log(roomNos);
-    console.log(approvalLevel);
-
-    const arrival_date = moment(bookingData.arrivalDate, "DD/MM/YYYY");
-    const departure_date = moment(bookingData.departureDate, "DD/MM/YYYY");
+    const arrival_date = moment(bookingData.arrivalDate, "DD/MM/YYYY").tz('Asia/Kolkata');
+    const departure_date = moment(bookingData.departureDate, "DD/MM/YYYY").tz('Asia/Kolkata');
 
     while (arrival_date.isSameOrBefore(departure_date)) {
-      const date = arrival_date.format("DD/MM/YYYY");
+      const date = arrival_date.tz("Asia/Kolkata").format("DD/MM/YYYY");
       for (let index = 0; index < arrivalDates.length; index++) {
         const formattedArrivalDate = moment(
           arrivalDates[index],
@@ -113,14 +92,10 @@ const checkOTP = async (req, res) => {
             approvalLevel[index] === "4");
 
         if (isWithinRange) {
-          // console.log(formattedArrivalDate.isSameOrBefore(formattedDate));
-          console.log(index);
-          // console.log(formattedArrivalDate.isSameOrAfter(formattedDate));
-
           return responseHandler(res, false, 409, date_conflict);
         }
       }
-      arrival_date.add(1, "day");
+      arrival_date.add(1, "day").tz("Asia/Kolkata");
     }
 
     bookingData.approvalLevel = "1";

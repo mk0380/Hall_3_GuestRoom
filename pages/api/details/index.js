@@ -1,3 +1,5 @@
+import schemaValidator from "@/utils/schemaValidator";
+
 const {
   roomDetailsSchema,
   visitorDetailsSchema,
@@ -13,14 +15,13 @@ const {
   invalid_visitor_details,
   error_occurred,
 } = require("@/important_data/important_data");
-const moment = require("moment");
+const moment = require("moment-timezone");
 const connectDB = require("@/utils/connectDB");
 const guestRoom = require("@/models/BookingDetails");
 const { emailToIndentorForOTP } = require("@/mailing/emailToIndentForOTP");
 const {
   internal_server_error,
   invalid_request_method,
-  validation_error,
 } = require("@/important_data/important_data");
 const responseHandler = require("@/utils/responseHandler");
 const crypto = require("crypto");
@@ -37,13 +38,7 @@ const details = async (req, res) => {
       return responseHandler(res, false, 400, form_incomplete);
     }
 
-    try {
-      await roomDetailsSchema.validate(room_details, {
-        strict: true,
-      });
-    } catch (error) {
-      return responseHandler(res, false, 401, validation_error(error.message));
-    }
+    // await schemaValidator(roomDetailsSchema, "room_details", room_details, res);
 
     const roomDetails = roomInDB.filter(
       (data) => data.no === room_details.room_no
@@ -58,13 +53,7 @@ const details = async (req, res) => {
       return responseHandler(res, false, 400, invalid_room_details);
     }
 
-    try {
-      await visitorDetailsSchema.validate(visitor_details, {
-        strict: true,
-      });
-    } catch (error) {
-      return responseHandler(res, false, 401, validation_error(error.message));
-    }
+    // await schemaValidator(visitorDetailsSchema, "visitor_details", visitor_details, res);
 
     const namesLen = visitor_details.name.length;
     const phonesLen = visitor_details.phone.length;
@@ -80,19 +69,18 @@ const details = async (req, res) => {
       return responseHandler(res, false, 400, invalid_visitor_details);
     }
 
-    try {
-      await indentorDetailsSchema.validate(indentor_details, {
-        strict: true,
-      });
-    } catch (error) {
-      return responseHandler(res, false, 401, validation_error(error.message));
-    }
+    // await schemaValidator(indentorDetailsSchema, "indentor_details", indentor_details, res);
 
     const pricePerDay = roomDetails[0].price;
-    const date1 = moment(room_details.arrival_date, "DD/MM/YYYY").toISOString();
+    const date1 = moment(
+      room_details.arrival_date,
+      "DD/MM/YYYY",
+      "Asia/Kolkata"
+    ).toISOString();
     const date2 = moment(
       room_details.departure_date,
-      "DD/MM/YYYY"
+      "DD/MM/YYYY",
+      "Asia/Kolkata"
     ).toISOString();
     const numOfDaysStay = moment(date2).diff(moment(date1), "days") + 1;
 
@@ -107,6 +95,9 @@ const details = async (req, res) => {
     );
 
     await connectDB(res);
+
+    // console.log(room_details.arrival_date);
+    // console.log(moment(room_details.arrival_date, "DD/MM/YYYY").tz("Asia/Kolkata"));
 
     const bookingData = new guestRoom({
       indentorDetails: indentor_details,
@@ -125,6 +116,8 @@ const details = async (req, res) => {
       },
       visitorDetails,
     });
+
+    // return
 
     const booking_res = await bookingData.save();
 
@@ -157,7 +150,9 @@ const details = async (req, res) => {
       res
     );
   } catch (error) {
-    console.log(`Some error ocured while details with the details: ${error.message}`);
+    console.log(
+      `Some error ocured while details with the details: ${error.message}`
+    );
     return responseHandler(res, false, 500, internal_server_error);
   }
 };
