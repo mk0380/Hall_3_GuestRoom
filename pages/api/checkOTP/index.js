@@ -26,8 +26,8 @@ const checkOTP = async (req, res) => {
 
     const { otp_password, requestId } = req.body;
 
-    await schemaValidator(bookingIdSchema, "bookingId", requestId, res);
-    await schemaValidator(otpSchema, "otp", otp_password, res);
+    // await schemaValidator(bookingIdSchema, "bookingId", requestId, res);
+    // await schemaValidator(otpSchema, "otp", otp_password, res);
 
     await connectDB(res);
 
