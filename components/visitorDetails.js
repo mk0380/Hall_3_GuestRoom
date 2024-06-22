@@ -78,7 +78,6 @@ const VisitorDetails = ({ tabChange, tab }) => {
         return false;
       }
     }
-
     return true;
   };
 

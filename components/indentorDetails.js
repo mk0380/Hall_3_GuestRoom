@@ -82,54 +82,40 @@ const IndentorDetails = ({ tabChange, tab }) => {
     },
   };
 
-  const sumbitHandler = async () => {
+  const btnHandler = async(route)=>{
     try {
+      const payload = route === 'details'? JSON.stringify(form):{
+        otp_password,
+        requestId
+      }
       const { data } = await axios.post(
-        "/api/details",
-        JSON.stringify(form),
+        `/api/${route}`,
+        payload,
         config
       );
-
-      if (data.success ?? false) {
-        setOtp(true);
-        setRequestId(data.id);
-        toast.success(data.message, { toastId: "details_1" });
-      } else {
-        toast.error(data.message, { toastId: "details_2" });
+      if(route === 'checkOTP'){
+        setOtp_password("");
       }
+      if (data?.success ?? false) {
+        if(route === 'details'){
+          setOtp(true);
+          setRequestId(data.id);
+        }else{
+          setDisableOTP(true);
+          router.push("/");
+          localStorage.clear();
+          setForm(formInitialState);
+        }
+        toast.success(data.message, { toastId: `${route}_1` });
+      } else {
+        toast.error(data.message, { toastId: `${route}_2` });
+      }      
     } catch (error) {
       toast.error(error?.response?.data?.message ?? error.message, {
-        toastId: "details_3",
+        toastId: `${route}_3`,
       });
     }
-  };
-
-  const checkOTPHandler = async () => {
-    try {
-      const { data } = await axios.post(
-        "/api/checkOTP",
-        {
-          otp_password,
-          requestId,
-        },
-        config
-      );
-      setOtp_password("");
-      if (data.success) {
-        toast.success(data.message, { toastId: "checkOTP_1" });
-        setDisableOTP(true);
-        localStorage.clear();
-        setForm(formInitialState);
-        router.push("/");
-      } else {
-        toast.error(data.message, { toastId: "checkOTP_2" });
-      }
-    } catch (error) {
-      toast.error(error?.response?.data?.message ?? error.message, {
-        toastId: "checkOTP_3",
-      });
-    }
-  };
+  }
 
   return (
     <div className={"" + (tab === "1" || tab === "2" ? "hidden" : "")}>
@@ -233,7 +219,7 @@ const IndentorDetails = ({ tabChange, tab }) => {
             disabled={checkValidForm() ?? true}
             style={{ marginTop: "0.5rem" }}
             className="btns"
-            onClick={sumbitHandler}
+            onClick={() => btnHandler('details')}
           >
             Submit
           </Button>
@@ -244,7 +230,7 @@ const IndentorDetails = ({ tabChange, tab }) => {
             disabled={otp_password?.trim()?.length === 0 ?? true}
             style={{ marginTop: "0.5rem" }}
             className="btns"
-            onClick={checkOTPHandler}
+            onClick={() => btnHandler('checkOTP')}
           >
             Check
           </Button>

@@ -1,5 +1,4 @@
 import schemaValidator from "@/utils/schemaValidator";
-
 const {
   roomDetailsSchema,
   visitorDetailsSchema,
@@ -14,6 +13,7 @@ const {
   invalid_room_details,
   invalid_visitor_details,
   error_occurred,
+  timezone_date,
 } = require("@/important_data/important_data");
 const moment = require("moment-timezone");
 const connectDB = require("@/utils/connectDB");
@@ -38,7 +38,12 @@ const details = async (req, res) => {
       return responseHandler(res, false, 400, form_incomplete);
     }
 
-    // await schemaValidator(roomDetailsSchema, "room_details", room_details, res);
+    console.log(room_details);
+
+    const { success, message } = await schemaValidator(roomDetailsSchema, null, room_details);
+    if (!success) {
+      return responseHandler(res, false, 401, message);
+    }
 
     const roomDetails = roomInDB.filter(
       (data) => data.no === room_details.room_no
@@ -53,7 +58,10 @@ const details = async (req, res) => {
       return responseHandler(res, false, 400, invalid_room_details);
     }
 
-    // await schemaValidator(visitorDetailsSchema, "visitor_details", visitor_details, res);
+    const { success: success2, message: message2 } = await schemaValidator(visitorDetailsSchema, null, visitor_details);
+    if (!success2) {
+      return responseHandler(res, false, 401, message2);
+    }
 
     const namesLen = visitor_details.name.length;
     const phonesLen = visitor_details.phone.length;
@@ -69,18 +77,21 @@ const details = async (req, res) => {
       return responseHandler(res, false, 400, invalid_visitor_details);
     }
 
-    // await schemaValidator(indentorDetailsSchema, "indentor_details", indentor_details, res);
+    const { success: success3, message: message3 } = await schemaValidator(indentorDetailsSchema, null, indentor_details);
+    if (!success3) {
+      return responseHandler(res, false, 401, message3);
+    }
 
     const pricePerDay = roomDetails[0].price;
     const date1 = moment(
       room_details.arrival_date,
       "DD/MM/YYYY",
-      "Asia/Kolkata"
+      timezone_date
     ).toISOString();
     const date2 = moment(
       room_details.departure_date,
       "DD/MM/YYYY",
-      "Asia/Kolkata"
+      timezone_date
     ).toISOString();
     const numOfDaysStay = moment(date2).diff(moment(date1), "days") + 1;
 
@@ -94,10 +105,10 @@ const details = async (req, res) => {
       }
     );
 
-    await connectDB(res);
-
-    // console.log(room_details.arrival_date);
-    // console.log(moment(room_details.arrival_date, "DD/MM/YYYY").tz("Asia/Kolkata"));
+    const { success_db, message_db } = await connectDB();
+    if (!success_db) {
+      return responseHandler(res, false, 503, message_db);
+    }
 
     const bookingData = new guestRoom({
       indentorDetails: indentor_details,
@@ -116,8 +127,6 @@ const details = async (req, res) => {
       },
       visitorDetails,
     });
-
-    // return
 
     const booking_res = await bookingData.save();
 
