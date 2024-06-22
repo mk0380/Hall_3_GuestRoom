@@ -1,5 +1,4 @@
 import schemaValidator from "@/utils/schemaValidator";
-
 const guestRoom = require("@/models/BookingDetails");
 const connectDB = require("@/utils/connectDB");
 const { dateSchema } = require("@/utils/inputValidation");
@@ -10,6 +9,7 @@ const {
   max_booking_day_period,
   date_incorrcet,
   error_occurred,
+  timezone_date,
 } = require("@/important_data/important_data");
 const responseHandler = require("@/utils/responseHandler");
 const moment = require("moment-timezone");
@@ -19,7 +19,7 @@ const timezone = require("dayjs/plugin/timezone");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-dayjs.tz.setDefault("Asia/Kolkata");
+dayjs.tz.setDefault(timezone_date);
 
 const checkDates = async (req, res) => {
   try {
@@ -31,19 +31,34 @@ const checkDates = async (req, res) => {
 
     arrivalDate = dayjs
       .tz(arrivalDate, "UTC")
-      .tz("Asia/Kolkata")
+      .tz(timezone_date)
       .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     departureDate = dayjs
       .tz(departureDate, "UTC")
-      .tz("Asia/Kolkata")
+      .tz(timezone_date)
       .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
 
-    await schemaValidator(dateSchema, "date", arrivalDate, res);
-    await schemaValidator(dateSchema, "date", departureDate, res);
+    const { success, message } = await schemaValidator(
+      dateSchema,
+      "date",
+      arrivalDate
+    );
+    if (!success) {
+      return responseHandler(res, false, 401, message);
+    }
 
-    const d1 = dayjs.tz(arrivalDate, "Asia/Kolkata");
-    const d2 = dayjs.tz(departureDate, "Asia/Kolkata");
-    const today = dayjs().tz("Asia/Kolkata");
+    const { success: success2, message: message2 } = await schemaValidator(
+      dateSchema,
+      "date",
+      departureDate
+    );
+    if (!success2) {
+      return responseHandler(res, false, 401, message2);
+    }
+
+    const d1 = dayjs.tz(arrivalDate, timezone_date);
+    const d2 = dayjs.tz(departureDate, timezone_date);
+    const today = dayjs().tz(timezone_date);
     const noOfDays = d2.diff(d1, "day");
 
     if (
@@ -54,11 +69,14 @@ const checkDates = async (req, res) => {
       return responseHandler(res, false, 401, date_incorrcet);
     }
 
-    arrivalDate = moment(arrivalDate).tz("Asia/Kolkata");
-    departureDate = moment(departureDate).tz("Asia/Kolkata");
+    arrivalDate = moment(arrivalDate).tz(timezone_date);
+    departureDate = moment(departureDate).tz(timezone_date);
 
-    await connectDB(res);
-
+    const { success_db, message_db } = await connectDB();
+    if (!success_db) {
+      return responseHandler(res, false, 503, message_db);
+    }
+    
     const allBookings = await guestRoom
       .find({})
       .select(["arrivalDate", "departureDate", "roomDetails", "approvalLevel"]);
@@ -68,11 +86,11 @@ const checkDates = async (req, res) => {
     }
 
     const arrivalDates = allBookings.map((booking) =>
-      moment(booking.arrivalDate, "DD/MM/YYYY", true).tz("Asia/Kolkata")
+      moment(booking.arrivalDate, "DD/MM/YYYY", true).tz(timezone_date)
     );
 
     const departureDates = allBookings.map((booking) =>
-      moment(booking.departureDate, "DD/MM/YYYY", true).tz("Asia/Kolkata")
+      moment(booking.departureDate, "DD/MM/YYYY", true).tz(timezone_date)
     );
 
     const roomNos = allBookings.map((booking) => booking.roomDetails.roomNo);
@@ -88,7 +106,7 @@ const checkDates = async (req, res) => {
     }, {});
 
     while (arrivalDate.isSameOrBefore(departureDate)) {
-      const date = arrivalDate.tz("Asia/Kolkata").format("DD/MM/YYYY");
+      const date = arrivalDate.tz(timezone_date).format("DD/MM/YYYY");
       const color = new Array(room_details?.length).fill("1");
 
       dates.push(
@@ -130,15 +148,15 @@ const checkDates = async (req, res) => {
         }
       }
       colorList.push(color);
-      arrivalDate = arrivalDate.tz("Asia/Kolkata").add(1, "day");
+      arrivalDate = arrivalDate.tz(timezone_date).add(1, "day");
     }
 
     const payload = {
       arrivalDate: moment(req.body.arrivalDate)
-        .tz("Asia/Kolkata")
+        .tz(timezone_date)
         .format("DD/MM/YYYY"),
       departureDate: moment(req.body.departureDate)
-        .tz("Asia/Kolkata")
+        .tz(timezone_date)
         .format("DD/MM/YYYY"),
       color: colorList,
       dates,

@@ -1,16 +1,14 @@
 import { hashPassword } from "@/utils/bcryptHandler";
-
+import schemaValidator from "@/utils/schemaValidator";
 const {
   email_not_registered,
   internal_server_error,
   invalid_request_method,
   otp_expired,
   otp_validated,
-  validation_error,
   wrong_otp,
   error_occurred,
 } = require("@/important_data/important_data");
-
 const User = require("@/models/User");
 const connectDB = require("@/utils/connectDB");
 const { emailSchema, otpSchema } = require("@/utils/inputValidation");
@@ -25,24 +23,28 @@ const validateOTP = async (req, res) => {
 
     const { otp, email } = req.body;
 
-    try {
-      await emailSchema.validate(
-        { email },
-        {
-          strict: true,
-        }
-      );
-      await otpSchema.validate(
-        { otp },
-        {
-          strict: true,
-        }
-      );
-    } catch (error) {
-      return responseHandler(res, false, 401, validation_error(error.message));
+    const { success, message } = await schemaValidator(emailSchema, null, {
+      email,
+    });
+    if (!success) {
+      return responseHandler(res, false, 400, message);
     }
 
-    await connectDB(res);
+    const { success: success2, message: message2 } = await schemaValidator(
+      otpSchema,
+      null,
+      {
+        otp,
+      }
+    );
+    if (!success2) {
+      return responseHandler(res, false, 400, message2);
+    }
+
+    const { success_db, message_db } = await connectDB();
+    if (!success_db) {
+      return responseHandler(res, false, 503, message_db);
+    }
 
     const userExist = await User.findOne({ email });
 

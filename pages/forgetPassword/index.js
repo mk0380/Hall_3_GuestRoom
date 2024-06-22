@@ -7,11 +7,6 @@ import { useRouter } from "next/router";
 import useCheckLoggedIn from "@/utils/checkLoggedIn";
 import Heading from "@/components/heading";
 import FormButton from "@/components/button";
-import {
-  emailSchema,
-  otpSchema,
-  passwordSchema,
-} from "@/utils/inputValidation";
 import FormField from "@/components/textField";
 
 const ForgetPassword = () => {
@@ -35,81 +30,42 @@ const ForgetPassword = () => {
     },
   };
 
-  const sendOTP = async () => {
+  const btnHandler = async (route) => {
     try {
-      await emailSchema.validate(
-        { email },
-        {
-          strict: true,
+      const payload = {
+        email,
+      };
+      if (route === "validateOTP") {
+        payload.otp = otp;
+      } else if (route === "passwordChange") {
+        payload.newPassword = newPassword;
+      }
+
+      const method = route === "passwordChange" ? "put" : "post";
+
+      const { data } = await axios({
+        method: method,
+        url: `/api/${route}`,
+        data: payload,
+        ...config
+      });
+      
+      if (data?.success ?? false) {
+        if (route === "forgetPassword") {
+          setDisabled(false);
+        } else if (route === "validateOTP") {
+          setOtpcheck(false);
+        } else {
+          router.push("/login");
         }
-      );
-      const { data } = await axios.post(
-        "/api/forgetPassword",
-        { email },
-        config
-      );
-      if (data?.success) {
-        setDisabled(false);
-        toast.success(data.message, { toastId: "forgetPassword_1" });
+        toast.success(data.message, { toastId: `${route}_1` });
       } else {
-        toast.error(data.message, { toastId: "forgetPassword_2" });
+        toast.error(data.message, { toastId: `${route}_2` });
       }
     } catch (error) {
       toast.error(error.response?.data?.message ?? error.message, {
-        toastId: "forgetPassword_3",
+        toastId: `${route}_3`,
       });
-      // all reposonse with status codes outside the range of 2xx will move to the catch block
-    }
-  };
-
-  const validateOTP = async () => {
-    try {
-      await otpSchema.validate(
-        { otp },
-        {
-          strict: true,
-        }
-      );
-      const { data } = await axios.post(
-        "/api/validateOTP",
-        { email, otp },
-        config
-      );
-      if (data.success) {
-        setOtpcheck(false);
-        toast.success(data.message, { toastId: "validateOTP_1" });
-      } else {
-        toast.error(data.message, { toastId: "validateOTP_2" });
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message ?? error.message, {
-        toastId: "validateOTP_3",
-      });
-      // all reposonse with status codes outside the range of 2xx will move to the catch block
-    }
-  };
-
-  const passwordChangeHandler = async () => {
-    try {
-      await passwordSchema.validate(
-        { password: newPassword },
-        {
-          strict: true,
-        }
-      );
-      const { data } = await axios.put(
-        "/api/passwordChange",
-        { email, newPassword },
-        config
-      );
-      if (data?.success) {
-        router.push("/login");
-        toast.success(data.message, { toastId: "passwordChange_1"});
-      } else {
-        toast.error(data.message, { toastId: "passwordChange_2"});
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message ?? error.message, { toastId: "passwordChange_3"});
       // all reposonse with status codes outside the range of 2xx will move to the catch block
     }
   };
@@ -132,7 +88,10 @@ const ForgetPassword = () => {
             width={"25ch"}
           />
 
-          <FormButton onClick={sendOTP} disabled={!disabled}>
+          <FormButton
+            onClick={() => btnHandler("forgetPassword")}
+            disabled={!disabled}
+          >
             Send OTP
           </FormButton>
           {otpcheck && (
@@ -148,7 +107,10 @@ const ForgetPassword = () => {
             />
           )}
           {otpcheck && (
-            <FormButton onClick={validateOTP} disabled={disabled ?? true}>
+            <FormButton
+              onClick={() => btnHandler("validateOTP")}
+              disabled={disabled ?? true}
+            >
               Validate OTP
             </FormButton>
           )}
@@ -165,7 +127,7 @@ const ForgetPassword = () => {
             />
           )}
           {!otpcheck && (
-            <FormButton onClick={passwordChangeHandler}>
+            <FormButton onClick={() => btnHandler("passwordChange")}>
               Set New Password
             </FormButton>
           )}

@@ -1,3 +1,5 @@
+import schemaValidator from "@/utils/schemaValidator";
+
 const {
   internal_server_error,
   invalid_request_method,
@@ -21,16 +23,18 @@ const login = async (req, res) => {
 
     const { email, password } = req.body;
 
-    try {
-      await userSchema.validate({ email, password }, {
-        strict: true,
-      });
-    } catch (error) {
+    const { success } = await schemaValidator(userSchema, null, {
+      email,
+      password,
+    });
+    if (!success) {
       return responseHandler(res, false, 400, wrong_credentials);
     }
 
-    await connectDB(res);
-
+    const { success_db, message_db } = await connectDB();
+    if (!success_db) {
+      return responseHandler(res, false, 503, message_db);
+    }
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -62,16 +66,9 @@ const login = async (req, res) => {
       })
     );
 
-    return res.status(200).json({
-      success: true,
-      user: {
-        email: user.email,
-        role: user.role,
-      },
-      message: login_successful,
-    });
+    return responseHandler(res, true, 200, login_successful, null);
   } catch (error) {
-    console.log(error);
+    console.log(`Some error occured while login: ${error.message}`);
     return responseHandler(res, false, 500, internal_server_error);
   }
 };

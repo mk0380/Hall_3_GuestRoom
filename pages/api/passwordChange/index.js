@@ -1,9 +1,9 @@
+import schemaValidator from "@/utils/schemaValidator";
 const { hashPassword, passwordMatch } = require("@/utils/bcryptHandler");
 const {
   email_not_registered,
   internal_server_error,
   invalid_request_method,
-  validation_error,
   password_changed_successfully,
   error_occurred,
   invalid_request,
@@ -21,25 +21,26 @@ const passwordChange = async (req, res) => {
 
     const { email, newPassword } = req.body;
 
-    try {
-      await emailSchema.validate(
-        { email },
-        {
-          strict: true,
-        }
-      );
-
-      await passwordSchema.validate(
-        { password: newPassword },
-        {
-          strict: true,
-        }
-      );
-    } catch (error) {
-      return responseHandler(res, false, 401, validation_error(error.message));
+    const { success, message } = await schemaValidator(emailSchema, null, {
+      email,
+    });
+    if (!success) {
+      return responseHandler(res, false, 401, message);
     }
 
-    await connectDB(res);
+    const { success: success2, message: message2 } = await schemaValidator(
+      passwordSchema,
+      "password",
+      newPassword
+    );
+    if (!success2) {
+      return responseHandler(res, false, 401, message2);
+    }
+
+    const { success_db, message_db } = await connectDB();
+    if (!success_db) {
+      return responseHandler(res, false, 503, message_db);
+    }
 
     const userExist = await User.findOne({ email });
 

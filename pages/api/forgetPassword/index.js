@@ -1,3 +1,5 @@
+import schemaValidator from "@/utils/schemaValidator";
+
 const {
   invalid_request_method,
   validation_error,
@@ -26,15 +28,11 @@ const forgetPassword = async (req, res) => {
 
     const { email } = req.body;
 
-    try {
-      await emailSchema.validate(
-        { email },
-        {
-          strict: true,
-        }
-      );
-    } catch (error) {
-      return responseHandler(res, false, 400, validation_error(error.message));
+    const { success, message } = await schemaValidator(emailSchema, null, {
+      email
+    });
+    if (!success) {
+      return responseHandler(res, false, 400, message);
     }
 
     const validEmails = [...warden_email_list, ...hall_office_email_list];
@@ -43,8 +41,11 @@ const forgetPassword = async (req, res) => {
       return responseHandler(res, false, 401, invalid_email);
     }
 
-    await connectDB(res);
-
+    const { success_db, message_db } = await connectDB();
+    if (!success_db) {
+      return responseHandler(res, false, 503, message_db);
+    }
+    
     const user = await User.findOne({ email });
 
     if (!user) {

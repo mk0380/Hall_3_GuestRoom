@@ -5,7 +5,6 @@ import axios from "axios";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { userSchema } from "@/utils/inputValidation";
 import Heading from "@/components/heading";
 import FormButton from "@/components/button";
 import FormField from "@/components/textField";
@@ -41,10 +40,6 @@ const Register = () => {
   const register = async (e) => {
     try {
       e.preventDefault();
-
-      await userSchema.validate(user, {
-        strict: true,
-      });
       const { data } = await axios.post("/api/register", user, config);
       if (data?.success) {
         router.push("/dashboard");
@@ -94,8 +89,12 @@ const Register = () => {
               alignItems: "center",
             }}
           >
-            <Link href={"/login"} style={{fontWeight:"600"}}>Login</Link>
-            <Link href={"/forgetPassword"} style={{fontWeight:"600"}}>Forget Password ?</Link>
+            <Link href={"/login"} style={{ fontWeight: "600" }}>
+              Login
+            </Link>
+            <Link href={"/forgetPassword"} style={{ fontWeight: "600" }}>
+              Forget Password ?
+            </Link>
           </div>
         </div>
       </div>

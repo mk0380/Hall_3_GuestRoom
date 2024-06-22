@@ -5,7 +5,6 @@ import axios from "axios";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { userSchema } from "@/utils/inputValidation";
 import Heading from "@/components/heading";
 import FormButton from "@/components/button";
 import FormField from "@/components/textField";
@@ -42,10 +41,6 @@ const Login = () => {
   const login = async (e) => {
     try {
       e.preventDefault();
-
-      await userSchema.validate(user, {
-        strict: true,
-      });
       const { data } = await axios.post("/api/login", user, config);
       if (data?.success) {
         router.push("/dashboard");

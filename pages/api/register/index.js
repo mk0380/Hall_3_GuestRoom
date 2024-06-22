@@ -1,4 +1,5 @@
 import authoriseUser from "@/utils/authoriseUser";
+import schemaValidator from "@/utils/schemaValidator";
 const { hashPassword } = require("@/utils/bcryptHandler");
 const User = require("@/models/User");
 const connectDB = require("@/utils/connectDB");
@@ -11,7 +12,6 @@ const {
   warden_email_list,
   token_not_provided,
   invalid_request_method,
-  validation_error,
   email_not_authorized,
   email_already_registered,
   code_warden,
@@ -26,14 +26,15 @@ const register = async (req, res) => {
     if (req.method === "GET") {
       const data = await authoriseUser(req);
 
-      if (data?.success || false) {
-        return res.status(200).json({
+      if (data?.success ?? false) {
+        const payload = {
           user: {
             email: data?.email ?? "",
             role: data?.role ?? "",
           },
-          success: true,
-        });
+        };
+
+        return responseHandler(res, true, 200, "", payload);
       } else {
         return responseHandler(res, false, 401, token_not_provided);
       }
@@ -45,15 +46,12 @@ const register = async (req, res) => {
 
     const { email, password } = req.body;
 
-    try {
-      await userSchema.validate(
-        { email, password },
-        {
-          strict: true,
-        }
-      );
-    } catch (error) {
-      return responseHandler(res, false, 400, validation_error(error.message));
+    const { success, message } = await schemaValidator(userSchema, null, {
+      email,
+      password,
+    });
+    if (!success) {
+      return responseHandler(res, false, 400, message);
     }
 
     const validEmails = [...warden_email_list, ...hall_office_email_list];
@@ -62,7 +60,10 @@ const register = async (req, res) => {
       return responseHandler(res, false, 401, email_not_authorized);
     }
 
-    await connectDB(res);
+    const { success_db, message_db } = await connectDB();
+    if (!success_db) {
+      return responseHandler(res, false, 503, message_db);
+    }
 
     const user = await User.findOne({ email });
 
@@ -99,16 +100,9 @@ const register = async (req, res) => {
       })
     );
 
-    return res.status(200).json({
-      success: true,
-      user: {
-        email: newUser.email,
-        role: newUser.role,
-      },
-      message: registration_successful,
-    });
+    return responseHandler(res, true, 200, registration_successful, null);
   } catch (error) {
-    console.log(error.message);
+    console.log(`Some error occured while registratoin: ${error.message}`);
     return responseHandler(res, false, 500, internal_server_error);
   }
 };

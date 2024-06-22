@@ -11,7 +11,6 @@ import { useRouter } from "next/router";
 import Heading from "@/components/heading";
 import {
   max_booking_day_period,
-  room_details,
 } from "@/important_data/important_data";
 import { toast } from "react-toastify";
 import LazyCheckDates from "@/components/lazyCheckDates";
@@ -30,27 +29,6 @@ const CheckDates = () => {
   const { arrivalDate, departureDate, colorList, datesColor, room, display } =
     datesState;
 
-  const checkDateSpan = () => {
-    if (!arrivalDate || !departureDate) {
-      return true;
-    } else {
-      const d1 = dayjs(arrivalDate);
-      const d2 = dayjs(departureDate);
-      const today = dayjs();
-
-      const noOfDays = d2.diff(d1, "day");
-      if (
-        noOfDays > max_booking_day_period ||
-        d1 > d2 ||
-        d1.isBefore(today, "day")
-      ) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-  };
-
   const config = {
     headers: {
       "Content-type": "application/json",
@@ -65,7 +43,7 @@ const CheckDates = () => {
         config
       );
 
-      if (data?.success) {
+      if (data?.success ?? false) {
         setDatesState({
           ...datesState,
           colorList: data.payload.color,
@@ -78,7 +56,9 @@ const CheckDates = () => {
         toast.error(data.message, { toastId: "check_dates_1" });
       }
     } catch (error) {
-      toast.error(error.response?.data?.message ?? error.message, { toastId: "check_dates_2" });
+      toast.error(error.response?.data?.message ?? error.message, {
+        toastId: "check_dates_2",
+      });
     }
   };
 
@@ -88,7 +68,6 @@ const CheckDates = () => {
     localStorage.setItem("room", room);
     router.push("/formFillup");
   };
-
 
   return (
     <div className="home checkDatesSection">
@@ -120,7 +99,7 @@ const CheckDates = () => {
           </LocalizationProvider>
           <Button
             variant="outlined"
-            disabled={checkDateSpan() ?? true}
+            disabled={!arrivalDate || !departureDate}
             className="btn btns"
             onClick={checkStatus}
           >

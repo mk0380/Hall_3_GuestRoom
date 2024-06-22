@@ -5,14 +5,13 @@ const {
 } = require("@/important_data/important_data");
 const mongoose = require("mongoose");
 
-const connectDB = async (res) => {
+const connectDB = async () => {
   if (!process.env.MONGODB_URL) {
     console.error("MongoDB URL is not defined in environment variables.");
-    // return responseHandler(res, false, 503, db_url_not_defined_error);
     return {
-      success: false,
-      message: db_url_not_defined_error
-    }
+      success_db: false,
+      message_db: db_url_not_defined_error,
+    };
   }
 
   try {
@@ -20,24 +19,22 @@ const connectDB = async (res) => {
 
     if ((connection?.connection?.readyState ?? 0) !== 1) {
       console.error("Database connection failed: Not ready.");
-      // return responseHandler(res, false, 503, db_connection_failed);
       return {
-        success: false,
-        message: db_connection_failed
-      }
+        success_db: false,
+        message_db: db_connection_failed,
+      };
     }
 
     return {
-      success: true,
-      message: ""
-    }
+      success_db: true,
+      message_db: null,
+    };
   } catch (error) {
     console.error(`Database connection error: ${error.message}`);
-    // return responseHandler(res, false, 503, db_connection_error);
     return {
-      success: false,
-      message: db_connection_error
-    }
+      success_db: false,
+      message_db: db_connection_error,
+    };
   }
 };
 

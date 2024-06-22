@@ -10,8 +10,8 @@ const useCheckLoggedIn = () => {
   const checkLoggedIn = async (route_1, route_2) => {
     try {
       const { data } = await axios.get("/api/register");
-      if (data.success) {
-        setAdmin(data.user);
+      if (data?.success ?? false) {
+        setAdmin(data.payload.user);
         router.push(route_2);
       } else {
         router.push(route_1);

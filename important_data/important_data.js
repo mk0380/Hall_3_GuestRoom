@@ -122,6 +122,9 @@ exports.toast_timer = 10000 //in ms
 exports.wrongURL_redirect_timer = 4000 //inms
 
 
+exports.timezone_date = "Asia/Kolkata"
+
+
 // messages to dispaly to user, register page
 exports.token_verified = "Token verified successfully";
 exports.invalid_or_expired_token = "Invalid or expired token";
