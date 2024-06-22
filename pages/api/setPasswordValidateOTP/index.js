@@ -4,16 +4,16 @@ import {
   invalid_request_method,
   otp_expired,
   password_updated,
-  validation_error,
   wrong_otp,
 } from "@/important_data/important_data";
+import authoriseUser from "@/utils/authoriseUser";
 import { hashPassword } from "@/utils/bcryptHandler";
 import connectDB from "@/utils/connectDB";
 import responseHandler from "@/utils/responseHandler";
+import schemaValidator from "@/utils/schemaValidator";
 import moment from "moment";
 const { userSchema, otpSchema } = require("@/utils/inputValidation");
 const User = require("@/models/User");
-
 
 const setPasswordValidateOTP = async (req, res) => {
   try {
@@ -21,31 +21,36 @@ const setPasswordValidateOTP = async (req, res) => {
       return responseHandler(res, false, 400, invalid_request_method);
     }
 
-    const { otp, email, password } = req.body;
+    const { otp, password } = req.body;
 
-    try {
-      await userSchema.validate(
-        { email, password },
-        {
-          strict: true,
-        }
-      );
-    } catch (error) {
-      return responseHandler(res, false, 400, validation_error(error.message));
+    const isAuthorized = await authoriseUser(req, res);
+    if (!isAuthorized.success) {
+      return responseHandler(res, false, 401, invalid_or_expired_token);
     }
 
-    try {
-      await otpSchema.validate(
-        { otp },
-        {
-          strict: true,
-        }
-      );
-    } catch (error) {
-      return responseHandler(res, false, 400, validation_error(error.message));
+    const { email } = isAuthorized;
+
+    const { success } = await schemaValidator(userSchema, null, {
+      email,
+      password,
+    });
+    if (!success) {
+      return responseHandler(res, false, 400, wrong_credentials);
     }
 
-    await connectDB();
+    const { success: success2, message: message2 } = await schemaValidator(
+      otpSchema,
+      "otp",
+      otp
+    );
+    if (!success2) {
+      return responseHandler(res, false, 401, message2);
+    }
+
+    const { success_db, message_db } = await connectDB();
+    if (!success_db) {
+      return responseHandler(res, false, 503, message_db);
+    }
 
     const userExist = await User.findOne({ email });
 
@@ -68,7 +73,7 @@ const setPasswordValidateOTP = async (req, res) => {
 
     userExist.OTP.value = null;
     userExist.OTP.expiryTime = null;
-    userExist.password = await hashPassword(password)
+    userExist.password = await hashPassword(password);
 
     const newUser = await userExist.save();
 
@@ -78,7 +83,7 @@ const setPasswordValidateOTP = async (req, res) => {
 
     return responseHandler(res, true, 200, password_updated);
   } catch (error) {
-    console.log(error.message);
+    console.log(`Some error occurend while changing password: ${error.message}`);
     return responseHandler(res, false, 500, internal_server_error);
   }
 };

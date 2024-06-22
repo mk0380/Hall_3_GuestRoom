@@ -44,25 +44,28 @@ const Dashboard = () => {
     try {
       const { data } = await axios.get("/api/fetchData");
 
-      let filteredData = [];
-      if (admin?.role === code_warden) {
-        filteredData = data?.allData?.filter(
-          (item) => item.approvalLevel === "1"
-        );
-      } else if (admin?.role === code_hall_office) {
-        filteredData = data?.allData?.filter(
-          (item) =>
-            item.approvalLevel === "2" ||
-            item.approvalLevel === "3" ||
-            item.approvalLevel === "4" ||
-            item.approvalLevel === "-1"
-        );
+      if (data?.success ?? false) {
+        let filteredData = [];
+        if (admin?.role === code_warden) {
+          filteredData = data?.payload?.allData?.filter(
+            (item) => item.approvalLevel === "1"
+          );
+        } else if (admin?.role === code_hall_office) {
+          filteredData = data?.payload?.allData?.filter(
+            (item) =>
+              item.approvalLevel === "2" ||
+              item.approvalLevel === "3" ||
+              item.approvalLevel === "4" ||
+              item.approvalLevel === "-1"
+          );
+        }
+        setTableData([...filteredData]);
+      } else {
+        toast.error(data.message, { toastId: "fetchData_1" });
       }
-
-      setTableData([...filteredData]);
     } catch (error) {
       toast.error(error.response?.data?.message ?? error.message, {
-        toastId: "fetchData_1",
+        toastId: "fetchData_2",
       });
     }
   };
@@ -79,14 +82,16 @@ const Dashboard = () => {
     try {
       const { data } = await axios.get("/api/logout");
 
-      if (data?.success) {
+      if (data?.success ?? false) {
         toast.success(data.message, { toastId: "logout_1" });
         router.push("/login");
       } else {
         toast.error(data.message, { toastId: "logout_2" });
       }
     } catch (error) {
-      toast.error(error.response?.data?.message ?? error.message, { toastId: "logout_3" });
+      toast.error(error.response?.data?.message ?? error.message, {
+        toastId: "logout_3",
+      });
     }
   };
 
@@ -122,7 +127,9 @@ const Dashboard = () => {
         toast.error(data.message, { toastId: "wardenApproval_2" });
       }
     } catch (error) {
-      toast.error(error.response?.data?.message ?? error.message, { toastId: "wardenApproval_3" });
+      toast.error(error.response?.data?.message ?? error.message, {
+        toastId: "wardenApproval_3",
+      });
     }
   };
 
@@ -143,7 +150,9 @@ const Dashboard = () => {
         toast.error(data.message, { toastId: "hallApproval_2" });
       }
     } catch (error) {
-      toast.error(error.response?.data?.message ?? error.message, { toastId: "hallApproval_3" });
+      toast.error(error.response?.data?.message ?? error.message, {
+        toastId: "hallApproval_3",
+      });
     }
   };
 
@@ -167,7 +176,9 @@ const Dashboard = () => {
       }
       setReason("");
     } catch (error) {
-      toast.error(error.response?.data?.message ?? error.message, { toastId: "wardenRejection_3" });
+      toast.error(error.response?.data?.message ?? error.message, {
+        toastId: "wardenRejection_3",
+      });
     }
   };
 
@@ -339,7 +350,7 @@ const Dashboard = () => {
   return (
     <div className="home">
       <div className="container">
-        <Heading/>
+        <Heading />
         <div className="tab">
           <div>
             <Button
@@ -404,7 +415,9 @@ const Dashboard = () => {
                 return (
                   <div className="modal_content" key={indx}>
                     <p>Name : {modalData?.visitorDetails[indx]?.name ?? ""}</p>
-                    <p>Mobile : {modalData?.visitorDetails[indx]?.phone ?? ""}</p>
+                    <p>
+                      Mobile : {modalData?.visitorDetails[indx]?.phone ?? ""}
+                    </p>
                     <p>
                       Relationship :{" "}
                       {modalData?.visitorDetails[indx]?.relationship ?? ""}

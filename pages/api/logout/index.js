@@ -25,7 +25,9 @@ const logout = async (req, res) => {
 
     return responseHandler(res, true, 200, logout_successfull);
   } catch (error) {
-    console.log(error);
+    console.log(
+      `Error during during logout: ${error.message}`
+    );
     return responseHandler(res, false, 500, internal_server_error);
   }
 };

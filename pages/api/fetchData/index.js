@@ -14,7 +14,10 @@ const fetchData = async (req, res) => {
       return responseHandler(res, false, 400, invalid_request_method);
     }
 
-    await connectDB();
+    const { success_db, message_db } = await connectDB();
+    if (!success_db) {
+      return responseHandler(res, false, 503, message_db);
+    }
 
     let allData = await bookingSchema.find({});
 
@@ -25,12 +28,22 @@ const fetchData = async (req, res) => {
     for (let index = 0; index < allData.length; index++) {
       allData[index].totalCost =
         "₹" +
-        parseInt(Math.ceil(allData[index].totalCost * percentage_price_to_be_paid_for_booking_confirmation)) +
+        parseInt(
+          Math.ceil(
+            allData[index].totalCost *
+              percentage_price_to_be_paid_for_booking_confirmation
+          )
+        ) +
         " + " +
         "₹" +
         parseInt(
           allData[index].totalCost -
-            parseInt(Math.ceil(allData[index].totalCost * percentage_price_to_be_paid_for_booking_confirmation))
+            parseInt(
+              Math.ceil(
+                allData[index].totalCost *
+                  percentage_price_to_be_paid_for_booking_confirmation
+              )
+            )
         );
 
       allData[index].status =
@@ -45,12 +58,11 @@ const fetchData = async (req, res) => {
           : "";
     }
 
-    return res.status(200).json({
-      success: true,
-      allData: allData,
-    });
+    return responseHandler(res, true, 200, "", { allData });
   } catch (error) {
-    console.log(error);
+    console.error(
+      `Error during during fetching of the dashboard data: ${error.message}`
+    );
     return responseHandler(res, false, 500, internal_server_error);
   }
 };

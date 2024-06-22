@@ -1,15 +1,13 @@
-"use client"
+"use client";
 
 import { TextField } from "@mui/material";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import useCheckLoggedIn from "@/utils/checkLoggedIn";
 import Heading from "@/components/heading";
-import { LoggedInUser } from "@/context/UserContext";
-import { emailSchema, otpSchema, userSchema } from "@/utils/inputValidation";
 import FormBox2 from "@/components/formBox2";
 
 const ChangePassword = () => {
@@ -19,12 +17,10 @@ const ChangePassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [otp, setOTP] = useState("");
 
-  const { admin } = useContext(LoggedInUser);
-
   const { checkLoggedIn } = useCheckLoggedIn();
 
   useEffect(() => {
-    checkLoggedIn('/login','/dashboard');
+    checkLoggedIn("/login", "/changePassword");
   }, []);
 
   const config = {
@@ -33,68 +29,40 @@ const ChangePassword = () => {
     },
   };
 
-  const validateOTP = async () => {
+  const btnHandler = async (route) => {
     try {
-      await otpSchema.validate(
-        { otp },
-        {
-          strict: true,
-        }
-      );
+      const payload = {
+        otp,
+        password: newPassword,
+      };
 
-      await userSchema.validate(
-        { email: admin.email, password: newPassword },
-        {
-          strict: true,
-        }
-      );
+      const method = route === "setPasswordValidateOTP" ? "put" : "post";
 
-      const { data } = await axios.put(
-        "/api/setPasswordValidateOTP",
-        { otp, email: admin.email, password: newPassword },
-        config
-      );
-      if (data?.success) {
-        router.push("/dashboard");
-        toast.success(data.message, { toastId: "setPasswordValidateOTP_1" });
+      const { data } = await axios({
+        method: method,
+        url: `/api/${route}`,
+        data: route === "setPassword" ? {} : payload,
+        ...config,
+      });
+
+      if (data?.success ?? false) {
+        if (route === "setPasswordValidateOTP") {
+          router.push("/dashboard");
+        } else {
+          setDisabled(true);
+        }
+        toast.success(data.message, { toastId: `${route}_1` });
       } else {
-        toast.error(data.message, { toastId: "setPasswordValidateOTP_2" });
+        toast.error(data.message, { toastId: `${route}_2` });
       }
     } catch (error) {
       toast.error(error.response?.data.message ?? error.message, {
-        toastId: "setPasswordValidateOTP_3",
+        toastId: `${route}_3`,
       });
     }
   };
 
-  const passwordChangeHandler = async () => {
-    try {
-      await emailSchema.validate(
-        { email: admin.email },
-        {
-          strict: true,
-        }
-      );
-
-      const { data } = await axios.post(
-        "/api/setPassword",
-        { email: admin.email },
-        config
-      );
-
-      if (data?.success) {
-        setDisabled(true);
-        toast.success(data.message, { toastId: "setPassword_1" });
-      } else {
-        toast.error(data.message, { toastId: "setPassword_2" });
-      }
-    } catch (error) {
-      toast.error(error.response?.data.message ?? error.message, {
-        toastId: "setPassword_3",
-      });
-    }
-  };
-
+  
   return (
     <div className="home">
       <div className="container">
@@ -106,7 +74,7 @@ const ChangePassword = () => {
               label="New Password"
               type="password"
               value={newPassword}
-              disabled={disabled}
+              disabled={disabled ?? true}
               onChange={(ev) => setNewPassword(ev.target.value)}
               InputProps={{
                 readOnly: false,
@@ -118,7 +86,7 @@ const ChangePassword = () => {
               variant="outlined"
               className="btns"
               disabled={disabled ?? true}
-              onClick={passwordChangeHandler}
+              onClick={() => btnHandler("setPassword")}
             >
               Change Password
             </Button>
@@ -140,7 +108,7 @@ const ChangePassword = () => {
               variant="outlined"
               className="btns"
               disabled={!disabled ?? true}
-              onClick={validateOTP}
+              onClick={() => btnHandler("setPasswordValidateOTP")}
             >
               Validate OTP
             </Button>
