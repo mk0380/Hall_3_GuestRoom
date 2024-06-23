@@ -32,3 +32,16 @@ Welcome to the Guest Room Booking Portal for the Hall of Residence 3 at IIT Kanp
    ```bash
    git clone https://github.com/your-repo/guest-room-booking.git
    cd guest-room-booking
+
+2. **Create Environment Variables File (.env) file**
+   ```bash
+   MONGODB_URL = ""
+   JWT_SECRET = ""
+   JWT_EXPIRE_DAY = 0
+   NODE_ENV = ""
+   EMAIL_SERVICE = ""
+   EMAIL_PORT = 000
+   EMAIL_USER = ""
+   EMAIL_PASSWORD = ""
+   OTP_SECRET = ""
+   GOOGLE_ANALYTICS = ""
