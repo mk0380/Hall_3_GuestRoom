@@ -19,7 +19,7 @@ Welcome to the Guest Room Booking Portal for the Hall of Residence 3 at IIT Kanp
   
 ## Technology Stack
 
-- **Frontend**: React with Next.js
+- **Frontend**: Next.js
 - **Backend**: Node.js with Express
 - **Database**: MongoDB
 - **Email Service**: Nodemailer for sending OTP emails
@@ -29,9 +29,9 @@ Welcome to the Guest Room Booking Portal for the Hall of Residence 3 at IIT Kanp
 
 ### Prerequisites
 
-- Node.js
+- Node.js@20
 - npm or yarn
-- MongoDB database
+- MongoDB atlas
 
 ### Steps
 
