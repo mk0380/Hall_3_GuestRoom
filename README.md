@@ -2,6 +2,9 @@
 
 Welcome to the Guest Room Booking Portal for the Hall of Residence 3 at IIT Kanpur. This portal is designed to streamline the booking process for guest rooms, providing a user-friendly interface for residents and visitors to make reservations efficiently and securely.
 
+![image](https://github.com/mk0380/Hall_3_GuestRoom/assets/123063925/d0369d7e-6704-42a2-bbf8-d9a9c18fd27d)
+
+
 ## Features
 
 - **Room Booking**: Users can select rooms, specify arrival and departure dates, and provide details for the visitors.
