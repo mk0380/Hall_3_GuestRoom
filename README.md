@@ -9,10 +9,14 @@ Welcome to the Guest Room Booking Portal for the Hall of Residence 3 at IIT Kanp
 
 - **Room Booking**: Users can select rooms, specify arrival and departure dates, and provide details for the visitors.
 - **Indentor Details**: Collecting and verifying the details of the indentor including name, email, phone, and roll number.
-- **OTP Verification**: Sending OTP to indentor's email for booking confirmation to ensure the authenticity of the request.
+- **OTP Verification**: Sending OTP for booking confirmation to ensure the authenticity of the request.
 - **Form Validation**: Comprehensive validation for room details, visitor details, and indentor details.
 - **Data Persistence**: Securely storing booking details in a MongoDB database.
+- **Separate Dashboards**: Different dashboards for warden and hall office control to manage bookings and other administrative tasks.
+- **Rate Limiter**: Implementing rate limiting to prevent abuse of the booking system.
+- **Analytics**: Providing analytics and reports for monitoring and management purposes.
 
+  
 ## Technology Stack
 
 - **Frontend**: React with Next.js
