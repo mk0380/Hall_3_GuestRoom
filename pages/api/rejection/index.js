@@ -1,18 +1,19 @@
 import {
+    code_hall_office,
+  code_warden,
   error_occurred,
   internal_server_error,
   invalid_or_expired_token,
   invalid_request_method,
   req_accepted,
   req_rejected,
-  validation_error,
-  warden_email_list,
 } from "@/important_data/important_data";
 import { rejectionEmail } from "@/mailing/rejectionEmail";
 import guestRoom from "@/models/BookingDetails";
 import authoriseUser from "@/utils/authoriseUser";
 import connectDB from "@/utils/connectDB";
 import responseHandler from "@/utils/responseHandler";
+import schemaValidator from "@/utils/schemaValidator";
 const { bookingIdSchema } = require("@/utils/inputValidation");
 
 const wardenRejection = async (req, res) => {
@@ -27,19 +28,25 @@ const wardenRejection = async (req, res) => {
     }
 
     const { booking_id, reason } = req.body;
+    const { role } = isAuthorized;
 
-    try {
-      await bookingIdSchema.validate(
-        { bookingId: booking_id },
-        {
-          strict: true,
-        }
-      );
-    } catch (error) {
-      return responseHandler(res, false, 400, validation_error(error.message));
+    if( role !== code_warden && role!==code_hall_office){
+        return responseHandler(res, false, 500, error_occurred);
     }
 
-    await connectDB();
+    const { success, message } = await schemaValidator(
+      bookingIdSchema,
+      "bookingId",
+      booking_id
+    );
+    if (!success) {
+      return responseHandler(res, false, 401, message);
+    }
+
+    const { success_db, message_db } = await connectDB();
+    if (!success_db) {
+      return responseHandler(res, false, 503, message_db);
+    }
 
     const checkBookingData = await guestRoom.findOne({ bookingId: booking_id });
 
@@ -47,11 +54,11 @@ const wardenRejection = async (req, res) => {
       return responseHandler(res, false, 500, error_occurred);
     }
 
-    if (warden_email_list.includes(isAuthorized.email) && checkBookingData.approvalLevel === "-1") {
+    if (role === code_warden && checkBookingData.approvalLevel === "-1") {
       return responseHandler(res, false, 409, req_rejected);
     }
 
-    if (warden_email_list.includes(isAuthorized.email) && checkBookingData.approvalLevel === "2") {
+    if (role === code_warden && checkBookingData.approvalLevel === "2") {
       return responseHandler(res, false, 409, req_accepted);
     }
 
@@ -72,7 +79,9 @@ const wardenRejection = async (req, res) => {
       res
     );
   } catch (error) {
-    console.log(error.message);
+    console.log(
+      `Some error occurend while rejecting the booking request: ${error.message}`
+    );
     return responseHandler(res, false, 500, internal_server_error);
   }
 };

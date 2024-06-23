@@ -95,96 +95,59 @@ const Dashboard = () => {
     }
   };
 
+  const modalHandler = (id) => {
+    if (id === "handleClickOpen") {
+      setChildModal(false);
+      setOpen(true);
+    } else if (id === "handleClose") {
+      setOpen(false);
+    } else if (id === "rejectHandler2") {
+      setOpen(true);
+      setChildModal(true);
+    }
+  };
+
   const config = {
     headers: {
       "Content-type": "application/json",
     },
   };
 
-  const handleClickOpen = () => {
-    setChildModal(false);
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const acceptHandle = async () => {
+  const btnHandler = async (route) => {
     try {
       const booking_id = modalData?.bookingId ?? "";
 
-      const { data } = await axios.put(
-        "/api/wardenApproval",
-        { booking_id },
-        config
-      );
+      const payload = {
+        booking_id,
+      };
 
-      if (data?.success) {
-        toast.success(data.message, { toastId: "wardenApproval_1" });
-        setOpen(!open);
+      if (route === "rejection") {
+        setChildModal(false);
+        payload.reason = reason;
+      }
+
+      const { data } = await axios.put(`/api/${route}`, payload, config);
+
+      if (route === "rejection") {
+        setOpen(false);
+      }
+
+      if (data?.success ?? false) {
+        toast.success(data.message, { toastId: `${route}_1` });
+        if (route === "approval") {
+          setOpen(!open);
+        }
       } else {
-        toast.error(data.message, { toastId: "wardenApproval_2" });
+        toast.error(data.message, { toastId: `${route}_2` });
+      }
+      if (route === "rejection") {
+        setReason("");
       }
     } catch (error) {
       toast.error(error.response?.data?.message ?? error.message, {
-        toastId: "wardenApproval_3",
+        toastId: `${route}_3`,
       });
     }
-  };
-
-  const hallApproval = async () => {
-    try {
-      const booking_id = modalData?.bookingId ?? "";
-
-      const { data } = await axios.put(
-        "/api/hallApproval",
-        { booking_id },
-        config
-      );
-
-      if (data?.success) {
-        toast.success(data.message, { toastId: "hallApproval_1" });
-        setOpen(!open);
-      } else {
-        toast.error(data.message, { toastId: "hallApproval_2" });
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message ?? error.message, {
-        toastId: "hallApproval_3",
-      });
-    }
-  };
-
-  const rejectHandler = async () => {
-    try {
-      setChildModal(false);
-
-      const booking_id = modalData?.bookingId ?? "";
-      const { data } = await axios.put(
-        "/api/wardenRejection",
-        { booking_id, reason },
-        config
-      );
-
-      setOpen(false);
-
-      if (data?.success) {
-        toast.success(data.message, { toastId: "wardenRejection_1" });
-      } else {
-        toast.error(data.message, { toastId: "wardenRejection_2" });
-      }
-      setReason("");
-    } catch (error) {
-      toast.error(error.response?.data?.message ?? error.message, {
-        toastId: "wardenRejection_3",
-      });
-    }
-  };
-
-  const rejectHandler2 = async () => {
-    setOpen(true);
-    setChildModal(true);
   };
 
   var style = {
@@ -260,11 +223,15 @@ const Dashboard = () => {
       export: false,
       render: (rowData) =>
         rowData && (
-          <IconButton onClick={handleClickOpen}>
+          <IconButton onClick={() => modalHandler("handleClickOpen")}>
             <Button
               variant="contained"
               style={{
                 padding: "0 5px",
+                color:
+                  rowData.status === "Rejected" || rowData.status === "Paid"
+                    ? ""
+                    : "white",
                 background:
                   rowData.status === "Rejected" || rowData.status === "Paid"
                     ? "white"
@@ -299,12 +266,15 @@ const Dashboard = () => {
                 variant="contained"
                 style={{
                   padding: "0 5px",
+                  color:
+                    rowData.status === "Rejected" || rowData.status === "Paid"
+                      ? ""
+                      : "white",
                   background:
                     rowData.status === "Rejected" || rowData.status === "Paid"
                       ? "white"
                       : "#5cb85c",
                 }}
-                // className="btns"
                 disabled={
                   rowData.status === "Rejected" || rowData.status === "Paid"
                 }
@@ -316,17 +286,20 @@ const Dashboard = () => {
                   : "Accept"}
               </Button>
             </IconButton>
-            <IconButton onClick={rejectHandler2}>
+            <IconButton onClick={() => modalHandler("rejectHandler2")}>
               <Button
                 variant="contained"
                 style={{
                   padding: "0 5px",
+                  color:
+                    rowData.status === "Rejected" || rowData.status === "Paid"
+                      ? ""
+                      : "white",
                   background:
                     rowData.status === "Rejected" || rowData.status === "Paid"
                       ? "white"
                       : "#d9534f",
                 }}
-                // className="btns"
                 disabled={
                   rowData.status === "Rejected" || rowData.status === "Paid"
                 }
@@ -395,7 +368,7 @@ const Dashboard = () => {
         {!childModal && (
           <Modal
             open={open}
-            onClose={handleClose}
+            onClose={() => modalHandler("handleClose")}
             aria-labelledby="parent-modal-title"
             aria-describedby="parent-modal-description"
           >
@@ -450,16 +423,11 @@ const Dashboard = () => {
                   alignItems: "center",
                 }}
               >
-                <IconButton
-                  onClick={
-                    modalData.approvalLevel === "1"
-                      ? acceptHandle
-                      : hallApproval
-                  }
-                >
+                <IconButton onClick={() => btnHandler("approval")}>
                   <Button
                     variant="contained"
-                    style={{ padding: "0 5px", background: "#5cb85c" }}
+                    style={{ padding: "0 5px", background: "#5cb85c",color: "white" }}
+                    
                   >
                     {modalData.approvalLevel === "2"
                       ? "Payment 1"
@@ -471,7 +439,7 @@ const Dashboard = () => {
                 <IconButton onClick={() => setChildModal(true)}>
                   <Button
                     variant="contained"
-                    style={{ padding: "0 5px", background: "#d9534f" }}
+                    style={{ padding: "0 5px", background: "#d9534f", color:'white' }}
                     className="btns"
                   >
                     Reject
@@ -484,7 +452,7 @@ const Dashboard = () => {
         {childModal && (
           <Modal
             open={open}
-            onClose={handleClose}
+            onClose={() => modalHandler("handleClose")}
             aria-labelledby="parent-modal-title"
             aria-describedby="parent-modal-description"
           >
@@ -511,10 +479,10 @@ const Dashboard = () => {
               </Box>
 
               <>
-                <IconButton onClick={rejectHandler}>
+                <IconButton onClick={() => btnHandler("rejection")}>
                   <Button
                     variant="contained"
-                    style={{ padding: "0 5px", background: "#5cb85c" }}
+                    style={{ padding: "0 5px", background: "#5cb85c", color:"white" }}
                     className="btns"
                   >
                     Confirm reject
@@ -523,7 +491,7 @@ const Dashboard = () => {
                 <IconButton onClick={() => setChildModal(false)}>
                   <Button
                     variant="contained"
-                    style={{ padding: "0 5px", background: "#d9534f" }}
+                    style={{ padding: "0 5px", background: "#d9534f", color:"white" }}
                     className="btns"
                   >
                     Close
