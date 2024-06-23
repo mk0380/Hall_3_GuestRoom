@@ -33,6 +33,7 @@ Welcome to the Guest Room Booking Portal for the Hall of Residence 3 at IIT Kanp
    git clone https://github.com/your-repo/guest-room-booking.git
    cd guest-room-booking
 
+
 2. **Create Environment Variables File (.env) file**
    ```bash
    MONGODB_URL = ""
@@ -45,3 +46,19 @@ Welcome to the Guest Room Booking Portal for the Hall of Residence 3 at IIT Kanp
    EMAIL_PASSWORD = ""
    OTP_SECRET = ""
    GOOGLE_ANALYTICS = ""
+
+
+3. **Install Dependencies**
+   ```bash
+   npm install --force
+
+
+4. **Running the Application**
+   ```bash
+   npm run dev
+
+
+
+
+
+   
