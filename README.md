@@ -29,7 +29,7 @@ Welcome to the Guest Room Booking Portal for the Hall of Residence 3 at IIT Kanp
 
 ### Prerequisites
 
-- Node.js@20
+- Node.js@20.14.0
 - npm or yarn
 - MongoDB atlas
 
@@ -38,7 +38,7 @@ Welcome to the Guest Room Booking Portal for the Hall of Residence 3 at IIT Kanp
 1. **Clone the Repository**
    ```bash
    git clone https://github.com/mk0380/Hall_3_GuestRoom.git
-   cd guest-room-booking
+   cd Hall_3_GuestRoom
 2. **Create Environment Variables File (.env) file**
    ```bash
    MONGODB_URL = ""
@@ -46,7 +46,7 @@ Welcome to the Guest Room Booking Portal for the Hall of Residence 3 at IIT Kanp
    JWT_EXPIRE_DAY = 0
    NODE_ENV = ""
    EMAIL_SERVICE = ""
-   EMAIL_PORT = 000
+   EMAIL_PORT = 0
    EMAIL_USER = ""
    EMAIL_PASSWORD = ""
    OTP_SECRET = ""
@@ -57,3 +57,19 @@ Welcome to the Guest Room Booking Portal for the Hall of Residence 3 at IIT Kanp
 4. **Running the Application**
    ```bash
    npm run dev
+
+### Usage
+
+- Open your browser and navigate to http://localhost:3000 (or the appropriate URL if deployed).
+- Make sure to add your admin emails in the important-data section for using the warden or hall office dashboard for administrative tasks and monitoring.
+- Make sure to remove the presence of @iitk.ac.in in the indentorDetailsSchema, which would allow you to book it through any of your email.
+- Select the desired room, fill in the required details (arrival, departure, visitor details), and submit.
+- Check your email for the OTP and enter it to confirm the booking.
+
+### Acknowledgments
+We would like to thank the following for their support and contributions:
+- The IIT Kanpur community for their feedback and support.
+- Contributors to the open-source libraries and tools used in this project.
+
+### Support
+  If you encounter any issues or have any questions, contact the project maintainer at [mayankkr21@iitk.ac.in].
