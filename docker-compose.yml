@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  nextjs:
+    container_name: nextjs-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      MONGODB_URL: 
+      JWT_SECRET: 
+      JWT_EXPIRE_DAY: 
+      NODE_ENV: not_production
+      EMAIL_SERVICE: 
+      EMAIL_PORT: 
+      EMAIL_USER: 
+      EMAIL_PASSWORD: 
+      OTP_SECRET: 
+      GOOGLE_ANALYTICS: 
+    volumes:
+      - app_data:/app
+      - app_node_modules:/app/node_modules
+
+volumes:
+  app_data:
+  app_node_modules:

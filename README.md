@@ -47,6 +47,17 @@ Welcome to the Guest Room Booking Portal for the Hall of Residence 3 at IIT Kanp
    ```bash
    npm run dev
 
+### Steps (Docker)
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/mk0380/Hall_3_GuestRoom.git
+   cd Hall_3_GuestRoom
+2. **Fill the appropriate Environment Variables in the docker-compose.yml->environment file, with the help of .env.example**
+3. **Run**
+   ```bash
+   docker-compose up
+
 ### Usage
 
 - Open your browser and navigate to http://localhost:3000 (or the appropriate URL if deployed).

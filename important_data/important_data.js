@@ -20,7 +20,7 @@ exports.hall_office_email_list = ["mayankkumar8766@gmail.com", "mayankkr21@iitk.
 
 
 // for mail dashboeard redirect link
-exports.frontend_url = "https://hall-3-guest-room.vercel.app/"
+exports.frontend_url = "https://hall3guestroom.netlify.app/"
 
 
 exports.percentage_price_to_be_paid_for_booking_confirmation = 0.1;
