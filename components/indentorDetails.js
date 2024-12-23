@@ -53,7 +53,7 @@ const IndentorDetails = ({ tabChange, tab }) => {
         (detail ?? "")
           .trim()
           .substring((detail ?? "").length - 10, (detail ?? "").length) !==
-          "iitk.ac.in"
+          "iiiiitk.ac.in"
       );
     } else if (name === "phone") {
       return (
