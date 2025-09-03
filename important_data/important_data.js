@@ -15,8 +15,8 @@ exports.rules_sub_heading = ["Key collection time: 10 am to 5 pm except Sunday."
 
 
 
-exports.warden_email_list = ["mayankkumar0380@gmail.com"];
-exports.hall_office_email_list = ["mayankkumar8766@gmail.com", "mayankkr21@iitk.ac.in"];
+exports.warden_email_list = ["warden@gmail.com"];
+exports.hall_office_email_list = ["hall1@gmail.com", "hall2@iitk.ac.in"];
 
 
 // for mail dashboeard redirect link
